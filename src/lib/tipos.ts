@@ -38,6 +38,25 @@ export interface Condicao {
   atualizado_por: string | null
 }
 
+/** Militar escalado no BRADO (só leitura; a condição é decidida no SEAQT). */
+export interface EscalaBrado {
+  data_servico: string
+  cod_lotacao: number
+  militar_id: string
+  turno: string | null
+  aviso: string | null
+  lido_em: string
+}
+
+/** Militar como lido pela ponte, antes de ser casado com o cadastro. */
+export interface MilitarBrado {
+  matricula: string
+  posto: string
+  nomeGuerra: string
+  turno: string | null
+  aviso: string | null
+}
+
 export interface ItemChecklist {
   data_servico: string
   chave: string
@@ -71,6 +90,8 @@ export interface Cadastros {
 export interface DadosDia {
   data: string
   condicoes: Condicao[]
+  /** Escala lida do BRADO (todas as lotações acompanhadas). */
+  escalaBrado: EscalaBrado[]
   /** Respostas do checklist indexadas pela chave. */
   checklist: Record<string, ItemChecklist>
   /** Ordenadas por horário (sem horário por último). */

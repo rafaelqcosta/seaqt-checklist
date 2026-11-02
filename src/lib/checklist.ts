@@ -1,5 +1,5 @@
 import { CHAVES, SISTEMAS_CBMDF } from './constantes'
-import type { Cadastros, DadosDia, Funcao, Militar, StatusCondicao } from './tipos'
+import type { Cadastros, Condicao, DadosDia, Funcao, Militar, StatusCondicao } from './tipos'
 
 /** true / false / null (não respondido). */
 export function valorBool(dia: DadosDia, chave: string): boolean | null {
@@ -18,17 +18,32 @@ export function valorIds(dia: DadosDia, chave: string): string[] {
   return Array.isArray(valor) ? valor.filter((id): id is string => typeof id === 'string') : []
 }
 
-/** Militares da equipe do dia, na ordem hierárquica, com o status de cada um. */
+/**
+ * Militares da equipe do dia, na ordem hierárquica, com o status de cada um.
+ * Entram os escalados no BRADO e os incluídos no SEAQT; quem só veio do BRADO
+ * aparece com condição ainda não informada.
+ */
 export function equipeDoDia(dia: DadosDia, cadastros: Cadastros) {
   const condicaoPorMilitar = new Map(dia.condicoes.map((c) => [c.militar_id, c]))
+  const bradoPorMilitar = new Map(dia.escalaBrado.map((e) => [e.militar_id, e]))
   return cadastros.militares
-    .filter((m) => condicaoPorMilitar.has(m.id))
-    .map((militar) => ({ militar, condicao: condicaoPorMilitar.get(militar.id)! }))
+    .filter((m) => condicaoPorMilitar.has(m.id) || bradoPorMilitar.has(m.id))
+    .map((militar) => ({
+      militar,
+      condicao: condicaoPorMilitar.get(militar.id) ?? condicaoNaoInformada(dia.data, militar.id),
+      brado: bradoPorMilitar.get(militar.id),
+    }))
 }
 
+function condicaoNaoInformada(data: string, militarId: string): Condicao {
+  return { data_servico: data, militar_id: militarId, status: null, observacao: null, atualizado_em: '', atualizado_por: null }
+}
+
+/** undefined = fora da equipe do dia. */
 export function statusDoMilitar(dia: DadosDia, militarId: string): StatusCondicao | null | undefined {
   const condicao = dia.condicoes.find((c) => c.militar_id === militarId)
-  return condicao ? condicao.status : undefined
+  if (condicao) return condicao.status
+  return dia.escalaBrado.some((e) => e.militar_id === militarId) ? null : undefined
 }
 
 /** Funções ativas com os militares escalados (ids desconhecidos são ignorados). */

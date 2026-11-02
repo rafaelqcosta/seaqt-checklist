@@ -11,6 +11,12 @@ export const POSTOS = [
 
 export const BASES = ['BUC', 'GBS'] as const
 
+/** Lotações lidas do BRADO (codLotacao -> sigla curta). Mesma lista no userscript da ponte. */
+export const LOTACOES_BRADO: Record<number, string> = {
+  2016: 'DELTA 1',
+  2015: 'GBS',
+}
+
 /** Ponto de referência para a meteorologia (Open-Meteo, sem chave de API). */
 export const LOCAL_METEO = { nome: 'Lago Paranoá', latitude: -15.8, longitude: -47.83 }
 

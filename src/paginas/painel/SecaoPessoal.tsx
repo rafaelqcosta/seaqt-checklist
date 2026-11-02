@@ -6,8 +6,10 @@ import { ROTULO_STATUS } from '../../components/Estado'
 import { SeletorMilitares } from '../../components/Modal'
 import { useUrlsAssinadas } from '../../lib/arquivos'
 import { equipeDoDia } from '../../lib/checklist'
+import { LOTACOES_BRADO } from '../../lib/constantes'
 import { nomeMilitar } from '../../lib/militares'
 import type { Militar, StatusCondicao } from '../../lib/tipos'
+import { BarraBrado } from './BarraBrado'
 import { LinkCadastros, Secao, Vazio, type PropsSecao } from './Secao'
 
 const BOTOES_STATUS: { status: StatusCondicao; ativo: string }[] = [
@@ -31,6 +33,7 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
 
   return (
     <Secao numero={1} titulo="Condição do pessoal" resumo={resumo}>
+      <BarraBrado briefing={briefing} dia={dia} />
       {equipe.length === 0 ? (
         <Vazio>
           {ativos.length === 0 ? (
@@ -45,7 +48,7 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
         </Vazio>
       ) : (
         <ul className="divide-y divide-slate-100">
-          {equipe.map(({ militar, condicao }) => (
+          {equipe.map(({ militar, condicao, brado }) => (
             <li key={militar.id} className="py-3 first:pt-0 last:pb-0">
               <div className="flex items-center gap-3">
                 <Avatar
@@ -55,17 +58,27 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-bold text-slate-900">{nomeMilitar(militar)}</p>
+                  {brado && (
+                    <p className="truncate text-xs text-slate-500">
+                      BRADO · {LOTACOES_BRADO[brado.cod_lotacao] ?? brado.cod_lotacao}
+                      {brado.turno && ` · ${brado.turno}`}
+                    </p>
+                  )}
+                  {brado?.aviso && <p className="text-xs font-semibold text-cbm-700">{brado.aviso}</p>}
                   {condicao.status === null && <p className="text-xs font-semibold text-amber-700">Condição não informada</p>}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => remover(militar)}
-                  title="Remover da equipe"
-                  aria-label={`Remover ${nomeMilitar(militar)} da equipe`}
-                  className="botao w-11 px-0 text-slate-400 hover:bg-red-50 hover:text-cbm-700"
-                >
-                  <UserMinus className="size-5" />
-                </button>
+                {/* quem está na escala do BRADO não sai daqui: marque ausente/inapto */}
+                {!brado && (
+                  <button
+                    type="button"
+                    onClick={() => remover(militar)}
+                    title="Remover da equipe"
+                    aria-label={`Remover ${nomeMilitar(militar)} da equipe`}
+                    className="botao w-11 px-0 text-slate-400 hover:bg-red-50 hover:text-cbm-700"
+                  >
+                    <UserMinus className="size-5" />
+                  </button>
+                )}
               </div>
 
               <div className="mt-2 grid grid-cols-3 gap-2" role="radiogroup" aria-label={`Condição de ${nomeMilitar(militar)}`}>

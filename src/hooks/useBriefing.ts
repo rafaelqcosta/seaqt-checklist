@@ -3,7 +3,7 @@ import { avisar } from '../lib/avisos'
 import { valorIds } from '../lib/checklist'
 import * as dados from '../lib/dados'
 import { mensagemErro, supabase } from '../lib/supabase'
-import type { Cadastros, Condicao, DadosDia, Militar, NovaOrdem, OrdemMissao, Viatura } from '../lib/tipos'
+import type { Cadastros, Condicao, DadosDia, Militar, MilitarBrado, NovaOrdem, OrdemMissao, Viatura } from '../lib/tipos'
 
 const INTERVALO_SEGURANCA_MS = 60_000
 const ESPERA_REALTIME_MS = 350
@@ -113,14 +113,41 @@ export function useBriefing(dataServico: string) {
   )
 
   const definirCondicao = useCallback(
-    (militarId: string, campos: Partial<Pick<Condicao, 'status' | 'observacao'>>) =>
-      executar(() => dados.salvarCondicao(dataServico, militarId, campos), {
-        dia: (d) => ({
-          ...d,
-          condicoes: d.condicoes.map((c) => (c.militar_id === militarId ? { ...c, ...campos } : c)),
-        }),
-      }),
-    [dataServico, executar],
+    (militarId: string, campos: Partial<Pick<Condicao, 'status' | 'observacao'>>) => {
+      // escalado no BRADO e ainda sem condição registrada: a primeira marcação cria a linha
+      const criar = Boolean(dia && !dia.condicoes.some((c) => c.militar_id === militarId))
+      return executar(() => dados.salvarCondicao(dataServico, militarId, campos, criar), {
+        dia: (d) =>
+          d.condicoes.some((c) => c.militar_id === militarId)
+            ? { ...d, condicoes: d.condicoes.map((c) => (c.militar_id === militarId ? { ...c, ...campos } : c)) }
+            : {
+                ...d,
+                condicoes: [
+                  ...d.condicoes,
+                  {
+                    data_servico: d.data,
+                    militar_id: militarId,
+                    status: null,
+                    observacao: null,
+                    atualizado_em: new Date().toISOString(),
+                    atualizado_por: null,
+                    ...campos,
+                  },
+                ],
+              },
+      })
+    },
+    [dataServico, dia, executar],
+  )
+
+  /** Grava a escala lida do BRADO pela ponte (pode ser de outro dia que não o exibido). */
+  const registrarEscalaBrado = useCallback(
+    async (data: string, codLotacao: number, militares: MilitarBrado[], lidoEm: string) => {
+      const ok = await executar(() => dados.registrarEscalaBrado(data, codLotacao, militares, lidoEm))
+      if (ok) recarregar()
+      return ok
+    },
+    [executar, recarregar],
   )
 
   const adicionarNaEquipe = useCallback(
@@ -262,6 +289,7 @@ export function useBriefing(dataServico: string) {
     definirCondicao,
     adicionarNaEquipe,
     removerDaEquipe,
+    registrarEscalaBrado,
     criarOrdem,
     excluirOrdem,
     salvarMilitar,

@@ -1,7 +1,19 @@
 import { redimensionarImagem } from './arquivos'
 import { ordenarMilitares } from './militares'
 import { BUCKET, supabase } from './supabase'
-import type { Cadastros, Condicao, DadosDia, Funcao, ItemChecklist, Militar, NovaOrdem, OrdemMissao, Viatura } from './tipos'
+import type {
+  Cadastros,
+  Condicao,
+  DadosDia,
+  EscalaBrado,
+  Funcao,
+  ItemChecklist,
+  Militar,
+  MilitarBrado,
+  NovaOrdem,
+  OrdemMissao,
+  Viatura,
+} from './tipos'
 
 export const TABELAS = [
   'seaqt_militares',
@@ -10,6 +22,7 @@ export const TABELAS = [
   'seaqt_condicoes',
   'seaqt_checklist',
   'seaqt_ordens_missao',
+  'seaqt_escala_brado',
 ] as const
 
 function verificar<T>(resposta: { data: T; error: unknown }): T {
@@ -35,8 +48,12 @@ export async function buscarCadastros(): Promise<Cadastros> {
 }
 
 export async function buscarDia(data: string): Promise<DadosDia> {
-  const [condicoes, checklist, ordens] = await Promise.all([
+  const [condicoes, escalaBrado, checklist, ordens] = await Promise.all([
     supabase.from('seaqt_condicoes').select('*').eq('data_servico', data),
+    supabase
+      .from('seaqt_escala_brado')
+      .select('data_servico, cod_lotacao, militar_id, turno, aviso, lido_em')
+      .eq('data_servico', data),
     supabase.from('seaqt_checklist').select('*').eq('data_servico', data),
     supabase
       .from('seaqt_ordens_missao')
@@ -48,6 +65,7 @@ export async function buscarDia(data: string): Promise<DadosDia> {
   return {
     data,
     condicoes: verificar(condicoes) as Condicao[],
+    escalaBrado: verificar(escalaBrado) as EscalaBrado[],
     checklist: Object.fromEntries((verificar(checklist) as ItemChecklist[]).map((item) => [item.chave, item])),
     ordens: verificar(ordens) as OrdemMissao[],
   }
@@ -65,7 +83,13 @@ export async function salvarCondicao(
   data: string,
   militarId: string,
   campos: Partial<Pick<Condicao, 'status' | 'observacao'>>,
+  /** Militar escalado no BRADO que ainda não tem condição registrada: cria a linha. */
+  criar = false,
 ): Promise<void> {
+  if (criar) {
+    verificar(await supabase.from('seaqt_condicoes').upsert({ data_servico: data, militar_id: militarId, ...campos }))
+    return
+  }
   // update (não upsert): se outro usuário acabou de tirar o militar da equipe, ele não volta sozinho
   verificar(
     await supabase.from('seaqt_condicoes').update(campos).eq('data_servico', data).eq('militar_id', militarId),
@@ -83,6 +107,23 @@ export async function adicionarNaEquipe(data: string, militarIds: string[]): Pro
 
 export async function removerDaEquipe(data: string, militarId: string): Promise<void> {
   verificar(await supabase.from('seaqt_condicoes').delete().eq('data_servico', data).eq('militar_id', militarId))
+}
+
+/** Substitui a escala lida do BRADO de uma lotação no dia (cadastra militares que faltarem). */
+export async function registrarEscalaBrado(
+  data: string,
+  codLotacao: number,
+  militares: MilitarBrado[],
+  lidoEm: string,
+): Promise<void> {
+  verificar(
+    await supabase.rpc('seaqt_registrar_escala_brado', {
+      p_data: data,
+      p_cod_lotacao: codLotacao,
+      p_militares: militares,
+      p_lido_em: lidoEm,
+    }),
+  )
 }
 
 export async function criarOrdem(data: string, campos: NovaOrdem, pdf?: File | null): Promise<void> {
