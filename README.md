@@ -36,7 +36,7 @@ O "dia de serviço" vira às **07:00 de Brasília** (`HORA_TROCA_SERVICO` em `sr
 ### Aplicar a migração no projeto do BUCOMAT
 
 Opção 1 — painel: Supabase do BUCOMAT → **SQL Editor** → cole o conteúdo de
-`supabase/migrations/20261028120000_seaqt_mvp.sql` → **Run**.
+`supabase/migrations/20261102131547_seaqt_mvp.sql` → **Run**.
 
 Opção 2 — CLI (sem trocar o login global do CLI): gere um token em *Account → Access Tokens* na conta do BUCOMAT e rode
 
