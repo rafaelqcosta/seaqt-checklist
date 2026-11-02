@@ -1,0 +1,172 @@
+import { redimensionarImagem } from './arquivos'
+import { ordenarMilitares } from './militares'
+import { BUCKET, supabase } from './supabase'
+import type { Cadastros, Condicao, DadosDia, Funcao, ItemChecklist, Militar, NovaOrdem, OrdemMissao, Viatura } from './tipos'
+
+export const TABELAS = [
+  'seaqt_militares',
+  'seaqt_viaturas',
+  'seaqt_funcoes',
+  'seaqt_condicoes',
+  'seaqt_checklist',
+  'seaqt_ordens_missao',
+] as const
+
+function verificar<T>(resposta: { data: T; error: unknown }): T {
+  if (resposta.error) throw resposta.error
+  return resposta.data
+}
+
+// ---------------------------------------------------------------------------
+// Leitura
+// ---------------------------------------------------------------------------
+
+export async function buscarCadastros(): Promise<Cadastros> {
+  const [militares, viaturas, funcoes] = await Promise.all([
+    supabase.from('seaqt_militares').select('id, posto_graduacao, nome_guerra, matricula, foto_path, ativo'),
+    supabase.from('seaqt_viaturas').select('id, prefixo, descricao, base, ativa, ordem').order('ordem').order('prefixo'),
+    supabase.from('seaqt_funcoes').select('id, nome, ordem, ativa').order('ordem').order('nome'),
+  ])
+  return {
+    militares: ordenarMilitares(verificar(militares) as Militar[]),
+    viaturas: verificar(viaturas) as Viatura[],
+    funcoes: verificar(funcoes) as Funcao[],
+  }
+}
+
+export async function buscarDia(data: string): Promise<DadosDia> {
+  const [condicoes, checklist, ordens] = await Promise.all([
+    supabase.from('seaqt_condicoes').select('*').eq('data_servico', data),
+    supabase.from('seaqt_checklist').select('*').eq('data_servico', data),
+    supabase
+      .from('seaqt_ordens_missao')
+      .select('*')
+      .eq('data_servico', data)
+      .order('horario', { ascending: true, nullsFirst: false })
+      .order('criado_em'),
+  ])
+  return {
+    data,
+    condicoes: verificar(condicoes) as Condicao[],
+    checklist: Object.fromEntries((verificar(checklist) as ItemChecklist[]).map((item) => [item.chave, item])),
+    ordens: verificar(ordens) as OrdemMissao[],
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dia de serviço
+// ---------------------------------------------------------------------------
+
+export async function salvarValor(data: string, chave: string, valor: unknown): Promise<void> {
+  verificar(await supabase.from('seaqt_checklist').upsert({ data_servico: data, chave, valor }))
+}
+
+export async function salvarCondicao(
+  data: string,
+  militarId: string,
+  campos: Partial<Pick<Condicao, 'status' | 'observacao'>>,
+): Promise<void> {
+  // update (não upsert): se outro usuário acabou de tirar o militar da equipe, ele não volta sozinho
+  verificar(
+    await supabase.from('seaqt_condicoes').update(campos).eq('data_servico', data).eq('militar_id', militarId),
+  )
+}
+
+export async function adicionarNaEquipe(data: string, militarIds: string[]): Promise<void> {
+  if (militarIds.length === 0) return
+  verificar(
+    await supabase
+      .from('seaqt_condicoes')
+      .upsert(militarIds.map((id) => ({ data_servico: data, militar_id: id })), { ignoreDuplicates: true }),
+  )
+}
+
+export async function removerDaEquipe(data: string, militarId: string): Promise<void> {
+  verificar(await supabase.from('seaqt_condicoes').delete().eq('data_servico', data).eq('militar_id', militarId))
+}
+
+export async function criarOrdem(data: string, campos: NovaOrdem, pdf?: File | null): Promise<void> {
+  let arquivo_path: string | null = null
+  if (pdf) {
+    arquivo_path = `om/${data}/${crypto.randomUUID()}.pdf`
+    verificar(await supabase.storage.from(BUCKET).upload(arquivo_path, pdf, { contentType: 'application/pdf' }))
+  }
+  const resposta = await supabase.from('seaqt_ordens_missao').insert({
+    data_servico: data,
+    ...campos,
+    arquivo_path,
+    arquivo_nome: pdf?.name ?? null,
+  })
+  if (resposta.error && arquivo_path) await supabase.storage.from(BUCKET).remove([arquivo_path])
+  verificar(resposta)
+}
+
+export async function excluirOrdem(ordem: OrdemMissao): Promise<void> {
+  verificar(await supabase.from('seaqt_ordens_missao').delete().eq('id', ordem.id))
+  if (ordem.arquivo_path) await supabase.storage.from(BUCKET).remove([ordem.arquivo_path])
+}
+
+// ---------------------------------------------------------------------------
+// Cadastros
+// ---------------------------------------------------------------------------
+
+export type CamposMilitar = Pick<Militar, 'posto_graduacao' | 'nome_guerra' | 'matricula' | 'ativo'>
+
+/**
+ * Cria (sem id) ou atualiza um militar; a foto, se enviada, substitui a anterior.
+ * A foto sobe antes do registro: se ela falhar, nenhum militar fica criado pela metade.
+ */
+export async function salvarMilitar(
+  campos: Partial<CamposMilitar> & { id?: string },
+  foto?: File | null,
+): Promise<void> {
+  const { id, ...resto } = campos
+  let novaFoto: string | null = null
+  if (foto) {
+    novaFoto = `fotos/${crypto.randomUUID()}.jpg`
+    const imagem = await redimensionarImagem(foto)
+    verificar(await supabase.storage.from(BUCKET).upload(novaFoto, imagem, { contentType: 'image/jpeg' }))
+  }
+  const registro = novaFoto ? { ...resto, foto_path: novaFoto } : resto
+
+  try {
+    if (!id) {
+      verificar(await supabase.from('seaqt_militares').insert(registro))
+      return
+    }
+    const anterior = verificar(
+      await supabase.from('seaqt_militares').select('foto_path').eq('id', id).single(),
+    ) as Pick<Militar, 'foto_path'>
+    verificar(await supabase.from('seaqt_militares').update(registro).eq('id', id))
+    if (novaFoto && anterior.foto_path) await supabase.storage.from(BUCKET).remove([anterior.foto_path])
+  } catch (erro) {
+    if (novaFoto) await supabase.storage.from(BUCKET).remove([novaFoto])
+    throw erro
+  }
+}
+
+export async function salvarViatura(campos: Partial<Omit<Viatura, 'id'>> & { id?: string }): Promise<void> {
+  const { id, ...resto } = campos
+  verificar(
+    id
+      ? await supabase.from('seaqt_viaturas').update(resto).eq('id', id)
+      : await supabase.from('seaqt_viaturas').insert(resto),
+  )
+}
+
+export async function excluirViatura(id: string): Promise<void> {
+  verificar(await supabase.from('seaqt_viaturas').delete().eq('id', id))
+}
+
+export async function salvarFuncao(campos: Partial<Omit<Funcao, 'id'>> & { id?: string }): Promise<void> {
+  const { id, ...resto } = campos
+  verificar(
+    id
+      ? await supabase.from('seaqt_funcoes').update(resto).eq('id', id)
+      : await supabase.from('seaqt_funcoes').insert(resto),
+  )
+}
+
+export async function excluirFuncao(id: string): Promise<void> {
+  verificar(await supabase.from('seaqt_funcoes').delete().eq('id', id))
+}

@@ -1,0 +1,66 @@
+/* source('.'): só varre src/ (o protótipo do Stitch na raiz geraria CSS à toa) */
+@import 'tailwindcss' source('.');
+
+/* Paleta do protótipo (DESIGN.md): azul náutico, vermelho CBMDF, verde operacional, âmbar de atenção */
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-marinho-950: #0b1c30;
+  --color-marinho-900: #0f2440;
+  --color-marinho-800: #172554;
+  --color-marinho-700: #1e3a8a;
+  --color-marinho-600: #2b4aa8;
+  --color-marinho-100: #dce9ff;
+  --color-marinho-50: #eff4ff;
+
+  --color-cbm-700: #b91c1c;
+  --color-cbm-600: #d9352f;
+
+  --color-fundo: #f8fafc;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply bg-fundo font-sans text-slate-900 antialiased;
+}
+
+/* TV: tudo em rem escala com a tela (16px em 1920x1080, 32px em 4K), sem rolagem */
+html.modo-tv {
+  font-size: min(calc(100vw / 120), calc(100vh / 67.5));
+}
+html.modo-tv body {
+  @apply overflow-hidden bg-marinho-950 text-white;
+}
+
+/* Classes reutilizáveis (como utilities, para poderem ser compostas com @apply) */
+@utility cartao {
+  @apply rounded-xl border border-slate-200 bg-white shadow-[0_1px_3px_0_rgba(15,23,42,0.05),0_1px_2px_-1px_rgba(15,23,42,0.03)];
+}
+
+@utility campo {
+  @apply min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base text-slate-900 outline-none placeholder:text-slate-400 focus:border-marinho-700 focus:ring-4 focus:ring-marinho-700/15 disabled:bg-slate-50;
+}
+
+@utility rotulo {
+  @apply mb-1 block text-xs font-semibold tracking-wide text-slate-500 uppercase;
+}
+
+@utility botao {
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition select-none disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility botao-primario {
+  @apply botao bg-marinho-700 text-white hover:bg-marinho-800;
+}
+
+@utility botao-secundario {
+  @apply botao border border-slate-300 bg-white text-slate-800 hover:bg-slate-100;
+}
+
+@utility botao-perigo {
+  @apply botao border border-red-200 bg-white text-cbm-700 hover:bg-red-50;
+}
