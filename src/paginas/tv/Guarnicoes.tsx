@@ -21,9 +21,9 @@ export function Guarnicoes({ dia, guarnicao }: Props) {
         <ul className="flex flex-col gap-2.5">
           {visiveis.map(({ funcao, militares }) => (
             <li key={funcao.id} className="min-w-0 leading-tight">
-              <div className="truncate text-base font-bold tracking-wider text-sky-300/80 uppercase">{funcao.nome}</div>
+              <div className="truncate text-base font-bold tracking-wider text-marinho-700 uppercase">{funcao.nome}</div>
               {militares.length === 0 ? (
-                <div className="text-2xl text-slate-600">—</div>
+                <div className="text-2xl text-slate-300">—</div>
               ) : (
                 <div className="truncate text-2xl font-semibold">
                   {militares.map((militar, indice) => {
@@ -33,7 +33,7 @@ export function Guarnicoes({ dia, guarnicao }: Props) {
                         {indice === 0 ? '' : indice === militares.length - 1 ? ' e ' : ', '}
                         {nomeMilitar(militar)}
                         {(status === 'inapto' || status === 'ausente') && (
-                          <TriangleAlert aria-label={status} className="ml-1.5 inline-block size-6 text-red-500" />
+                          <TriangleAlert aria-label={status} className="ml-1.5 inline-block size-6 text-cbm-600" />
                         )}
                       </span>
                     )

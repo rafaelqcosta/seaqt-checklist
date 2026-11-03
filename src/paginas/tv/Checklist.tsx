@@ -5,17 +5,10 @@ import { CHAVES, SISTEMAS_CBMDF } from '../../lib/constantes'
 import type { DadosDia } from '../../lib/tipos'
 import { Quadro } from './Quadro'
 
-// cores do IconeEstado são para fundo claro; na TV escura precisam ser mais vivas
-const COR_ICONE: Record<EstadoSecao, string> = {
-  ok: 'text-emerald-400!',
-  alerta: 'text-red-500!',
-  pendente: 'text-amber-400!',
-}
-
 const COR_DETALHE: Record<EstadoSecao, string> = {
-  ok: 'text-slate-300',
-  alerta: 'font-semibold text-red-300',
-  pendente: 'text-amber-200',
+  ok: 'text-slate-600',
+  alerta: 'font-semibold text-cbm-700',
+  pendente: 'text-amber-700',
 }
 
 const OBSERVACAO: Partial<Record<SecaoId, string>> = {
@@ -42,12 +35,12 @@ export function Checklist({ dia, resumo }: { dia: DadosDia; resumo: ResumoSecao[
           const texto = complemento(dia, secao.id)
           return (
             <li key={secao.id} className="flex gap-3">
-              <IconeEstado estado={secao.estado} className={`size-8 shrink-0 ${COR_ICONE[secao.estado]}`} />
+              <IconeEstado estado={secao.estado} className="size-8 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-xl leading-tight font-bold">{secao.titulo}</div>
                 <div className={`truncate text-base leading-snug ${COR_DETALHE[secao.estado]}`}>{secao.detalhe}</div>
                 {texto && (
-                  <div className={`text-sm leading-snug text-slate-400 ${secao.id === 'sistemas' ? 'line-clamp-2' : 'line-clamp-1'}`}>
+                  <div className={`text-sm leading-snug text-slate-500 ${secao.id === 'sistemas' ? 'line-clamp-2' : 'line-clamp-1'}`}>
                     {texto}
                   </div>
                 )}

@@ -13,14 +13,11 @@ const CARTOES_POR_LINHA = 8
 const MAXIMO_CARTOES = 16
 
 const ESTILO: Record<StatusCondicao | 'aguardando', { faixa: string; borda: string }> = {
-  apto: { faixa: 'bg-emerald-500 text-emerald-950', borda: 'border-emerald-400/40' },
-  inapto: { faixa: 'bg-red-600 text-white', borda: 'border-red-500 ring-2 ring-red-500/40' },
-  ausente: { faixa: 'bg-slate-600 text-slate-200', borda: 'border-white/10' },
-  aguardando: { faixa: 'bg-amber-400 text-amber-950', borda: 'border-amber-400/50' },
+  apto: { faixa: 'bg-emerald-600 text-white', borda: 'border-emerald-300' },
+  inapto: { faixa: 'bg-red-600 text-white', borda: 'border-red-500 ring-2 ring-red-500/30' },
+  ausente: { faixa: 'bg-slate-500 text-white', borda: 'border-slate-200' },
+  aguardando: { faixa: 'bg-amber-400 text-amber-950', borda: 'border-amber-300' },
 }
-
-// iniciais em fundo escuro (o padrão do Avatar é claro, feito para o celular)
-const AVATAR_ESCURO = 'bg-marinho-800! text-sky-100!'
 
 export function Pessoal({ equipe }: { equipe: Integrante[] }) {
   const urls = useUrlsAssinadas(equipe.map((integrante) => integrante.militar.foto_path))
@@ -50,10 +47,10 @@ export function Pessoal({ equipe }: { equipe: Integrante[] }) {
       extra={
         equipe.length > 0 && (
           <div className="flex shrink-0 gap-2">
-            <Contador quantidade={aptos} rotulo={plural(aptos, 'apto')} cor="bg-emerald-500/15 text-emerald-300" />
-            <Contador quantidade={inaptos} rotulo={plural(inaptos, 'inapto')} cor="bg-red-500/15 text-red-300" />
-            <Contador quantidade={ausentes} rotulo={plural(ausentes, 'ausente')} cor="bg-slate-500/20 text-slate-300" />
-            {aguardando > 0 && <Contador quantidade={aguardando} rotulo="aguardando" cor="bg-amber-400/15 text-amber-300" />}
+            <Contador quantidade={aptos} rotulo={plural(aptos, 'apto')} cor="bg-emerald-100 text-emerald-800" />
+            <Contador quantidade={inaptos} rotulo={plural(inaptos, 'inapto')} cor="bg-red-100 text-red-800" />
+            <Contador quantidade={ausentes} rotulo={plural(ausentes, 'ausente')} cor="bg-slate-200 text-slate-700" />
+            {aguardando > 0 && <Contador quantidade={aguardando} rotulo="aguardando" cor="bg-amber-100 text-amber-800" />}
           </div>
         )
       }
@@ -64,7 +61,7 @@ export function Pessoal({ equipe }: { equipe: Integrante[] }) {
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${colunas}, minmax(0, 1fr))` }}>
           {cartoes}
           {restantes > 0 && (
-            <div className="flex items-center justify-center rounded-2xl border border-dashed border-white/20 text-3xl font-bold text-slate-300">
+            <div className="flex items-center justify-center rounded-2xl border border-dashed border-slate-300 text-3xl font-bold text-slate-500">
               +{restantes}
             </div>
           )}
@@ -98,10 +95,10 @@ function Cartao({ militar, status, url, compacto }: CartaoProps) {
 
   if (compacto) {
     return (
-      <article className={`flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-marinho-900 p-2 ${estilo.borda} ${esmaecido}`}>
-        <Avatar militar={militar} url={url} className={`size-20 rounded-xl text-3xl ${AVATAR_ESCURO}`} />
+      <article className={`flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-white p-2 ${estilo.borda} ${esmaecido}`}>
+        <Avatar militar={militar} url={url} className="size-20 rounded-xl text-3xl" />
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="truncate text-base font-semibold text-slate-400">{militar.posto_graduacao}</div>
+          <div className="truncate text-base font-semibold text-slate-500">{militar.posto_graduacao}</div>
           <div className="truncate text-xl font-extrabold">{militar.nome_guerra}</div>
           <div className={`mt-1 inline-block max-w-full truncate rounded-md px-2 py-0.5 text-sm font-extrabold tracking-wide uppercase ${estilo.faixa}`}>
             {rotulo}
@@ -113,11 +110,11 @@ function Cartao({ militar, status, url, compacto }: CartaoProps) {
 
   return (
     <article
-      className={`flex max-w-[12rem] min-w-0 flex-1 basis-0 flex-col overflow-hidden rounded-2xl border bg-marinho-900 ${estilo.borda} ${esmaecido}`}
+      className={`flex max-w-[12rem] min-w-0 flex-1 basis-0 flex-col overflow-hidden rounded-2xl border bg-white ${estilo.borda} ${esmaecido}`}
     >
-      <Avatar militar={militar} url={url} className={`aspect-square w-full text-6xl ${AVATAR_ESCURO}`} />
+      <Avatar militar={militar} url={url} className="aspect-square w-full text-6xl" />
       <div className="px-3 py-2 leading-tight">
-        <div className="truncate text-lg font-semibold text-slate-400">{militar.posto_graduacao}</div>
+        <div className="truncate text-lg font-semibold text-slate-500">{militar.posto_graduacao}</div>
         <div className="truncate text-2xl font-extrabold">{militar.nome_guerra}</div>
       </div>
       <div className={`mt-auto py-1.5 text-center text-xl font-extrabold tracking-wide whitespace-nowrap uppercase ${estilo.faixa}`}>
@@ -130,10 +127,10 @@ function Cartao({ militar, status, url, compacto }: CartaoProps) {
 function EquipeVazia() {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-      <Users className="size-16 text-slate-500" />
+      <Users className="size-16 text-slate-400" />
       <p className="text-4xl font-bold">Equipe do dia ainda não informada</p>
-      <p className="text-2xl text-slate-300">
-        Preencha pelo celular: <span className="font-semibold text-sky-300">{location.origin + location.pathname}</span>
+      <p className="text-2xl text-slate-600">
+        Preencha pelo celular: <span className="font-semibold text-marinho-700">{location.origin + location.pathname}</span>
       </p>
     </div>
   )

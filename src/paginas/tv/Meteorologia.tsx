@@ -13,7 +13,7 @@ export function Meteorologia({ meteo, erro }: { meteo: Meteo | null; erro: boole
       Icone={CloudSun}
       className="shrink-0"
       extra={
-        <span className="shrink-0 text-sm text-slate-400">
+        <span className="shrink-0 text-sm text-slate-500">
           {LOCAL_METEO.nome}
           {meteo && ` · ${formatarHorario(meteo.medidoEm.slice(11))}`}
         </span>
@@ -22,7 +22,7 @@ export function Meteorologia({ meteo, erro }: { meteo: Meteo | null; erro: boole
       {meteo ? (
         <Previsao meteo={meteo} />
       ) : (
-        <p className="py-8 text-center text-xl text-slate-500">{erro ? 'Meteorologia indisponível' : 'Carregando…'}</p>
+        <p className="py-8 text-center text-xl text-slate-400">{erro ? 'Meteorologia indisponível' : 'Carregando…'}</p>
       )}
     </Quadro>
   )
@@ -44,22 +44,22 @@ function Previsao({ meteo }: { meteo: Meteo }) {
       )}
 
       <div className="flex items-center gap-4">
-        <IconeTempo tipo={iconeTempo(meteo.codigo, meteo.ehDia)} strokeWidth={1.5} className="size-[4.5rem] shrink-0 text-sky-200" />
+        <IconeTempo tipo={iconeTempo(meteo.codigo, meteo.ehDia)} strokeWidth={1.5} className="size-[4.5rem] shrink-0 text-marinho-600" />
         <div className="text-6xl leading-none font-extrabold tabular-nums">{Math.round(meteo.temperatura)}°</div>
         <div className="min-w-0 flex-1 leading-tight">
           <div className="line-clamp-2 text-xl font-semibold">{descricaoTempo(meteo.codigo)}</div>
           {meteo.maxima !== null && meteo.minima !== null && (
-            <div className="mt-1 text-base text-slate-400">
+            <div className="mt-1 text-base text-slate-500">
               Máx {Math.round(meteo.maxima)}° · Mín {Math.round(meteo.minima)}°
             </div>
           )}
         </div>
       </div>
 
-      <dl className="mt-3 divide-y divide-white/10">
+      <dl className="mt-3 divide-y divide-slate-100">
         <Linha Icone={Wind} rotulo="Vento">
           {Math.round(meteo.vento)} km/h {direcaoCardinal(meteo.direcaoVento)}
-          <span className="ml-1.5 text-base font-medium text-slate-400">rajada {Math.round(meteo.rajada)}</span>
+          <span className="ml-1.5 text-base font-medium text-slate-500">rajada {Math.round(meteo.rajada)}</span>
         </Linha>
         <Linha Icone={Droplets} rotulo="Umidade">
           {Math.round(meteo.umidade)}%
@@ -78,7 +78,7 @@ function Previsao({ meteo }: { meteo: Meteo }) {
 function Linha({ Icone, rotulo, children }: { Icone: LucideIcon; rotulo: string; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 py-1.5 leading-tight">
-      <dt className="flex items-center gap-2 text-lg text-slate-400">
+      <dt className="flex items-center gap-2 text-lg text-slate-500">
         <Icone className="size-5 shrink-0" />
         {rotulo}
       </dt>

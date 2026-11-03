@@ -14,14 +14,14 @@ export function Ordens({ ordens }: { ordens: OrdemMissao[] }) {
       ) : (
         <ul className="flex flex-col gap-2">
           {visiveis.map((ordem) => (
-            <li key={ordem.id} className="flex items-center gap-4 rounded-xl bg-white/5 px-3 py-2">
-              <span className="w-[5.25rem] shrink-0 text-2xl font-extrabold text-sky-300 tabular-nums">
+            <li key={ordem.id} className="flex items-center gap-4 rounded-xl bg-slate-50 px-3 py-2">
+              <span className="w-[5.25rem] shrink-0 text-2xl font-extrabold text-marinho-700 tabular-nums">
                 {formatarHorario(ordem.horario) || '—'}
               </span>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-2xl leading-tight font-semibold">{ordem.titulo}</div>
                 {(ordem.local || ordem.arquivo_path) && (
-                  <div className="flex items-center gap-3 text-base text-slate-400">
+                  <div className="flex items-center gap-3 text-base text-slate-500">
                     {ordem.local && (
                       <span className="flex min-w-0 items-center gap-1">
                         <MapPin className="size-4 shrink-0" />
@@ -29,7 +29,7 @@ export function Ordens({ ordens }: { ordens: OrdemMissao[] }) {
                       </span>
                     )}
                     {ordem.arquivo_path && (
-                      <span className="flex shrink-0 items-center gap-1 font-semibold text-slate-300">
+                      <span className="flex shrink-0 items-center gap-1 font-semibold text-slate-600">
                         <FileText className="size-4" />
                         PDF
                       </span>

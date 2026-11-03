@@ -10,13 +10,13 @@ interface QuadroProps {
   children: ReactNode
 }
 
-/** Painel escuro da TV. O conteúdo é cortado no limite do painel, nunca rola. */
+/** Painel da TV. O conteúdo é cortado no limite do painel, nunca rola. */
 export function Quadro({ titulo, Icone, extra, className = '', children }: QuadroProps) {
   return (
-    <section className={`flex min-h-0 min-w-0 flex-col rounded-2xl border border-white/10 bg-white/5 p-4 ${className}`}>
+    <section className={`flex min-h-0 min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>
       <header className="mb-3 flex shrink-0 items-center justify-between gap-3">
-        <h2 className="flex min-w-0 items-center gap-2.5 text-[1.1rem] font-bold tracking-[0.12em] text-slate-300 uppercase">
-          <Icone className="size-6 shrink-0 text-sky-300" />
+        <h2 className="flex min-w-0 items-center gap-2.5 text-[1.1rem] font-bold tracking-[0.12em] text-slate-500 uppercase">
+          <Icone className="size-6 shrink-0 text-marinho-700" />
           <span className="truncate">{titulo}</span>
         </h2>
         {extra}
@@ -27,13 +27,13 @@ export function Quadro({ titulo, Icone, extra, className = '', children }: Quadr
 }
 
 export function Vazio({ children }: { children: ReactNode }) {
-  return <p className="m-auto text-center text-xl text-slate-500">{children}</p>
+  return <p className="m-auto text-center text-xl text-slate-400">{children}</p>
 }
 
 /** Linha "e mais k" para os itens que não couberam. */
 export function Mais({ restantes }: { restantes: number }) {
   if (restantes === 0) return null
-  return <p className="shrink-0 pt-2 text-lg font-semibold text-slate-400">e mais {restantes}</p>
+  return <p className="shrink-0 pt-2 text-lg font-semibold text-slate-500">e mais {restantes}</p>
 }
 
 /** Até `maximo` itens; se passar, mostra um a menos para o "e mais k" ocupar o lugar do último. */

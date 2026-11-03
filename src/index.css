@@ -33,7 +33,7 @@ html.modo-tv {
   font-size: min(calc(100vw / 120), calc(100vh / 67.5));
 }
 html.modo-tv body {
-  @apply overflow-hidden bg-marinho-950 text-white;
+  @apply overflow-hidden bg-slate-100 text-slate-900;
 }
 
 /* Classes reutilizáveis (como utilities, para poderem ser compostas com @apply) */

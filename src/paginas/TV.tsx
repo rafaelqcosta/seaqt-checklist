@@ -21,7 +21,7 @@ export function TV() {
   // fora do Conteudo para não buscar de novo quando o dia de serviço vira e os dados recarregam
   const tempo = useMeteo()
 
-  // modo-tv: 1rem = 1/120 da largura e fundo escuro sem rolagem (index.css)
+  // modo-tv: 1rem = 1/120 da largura e fundo claro sem rolagem (index.css)
   useEffect(() => {
     document.documentElement.classList.add('modo-tv')
     return () => document.documentElement.classList.remove('modo-tv')
@@ -39,7 +39,7 @@ export function TV() {
         <Conteudo cadastros={cadastrosAtivos} dia={dia} resumo={resumo} tempo={tempo} />
       ) : (
         <div className="flex flex-1 items-center justify-center">
-          <LoaderCircle className="size-16 animate-spin text-sky-300" />
+          <LoaderCircle className="size-16 animate-spin text-marinho-600" />
         </div>
       )}
 
@@ -93,21 +93,21 @@ interface CabecalhoProps {
 
 function Cabecalho({ data, conectado, progressoChecklist }: CabecalhoProps) {
   return (
-    <header className="flex shrink-0 items-center gap-10 border-b border-white/10 pb-3">
+    <header className="flex shrink-0 items-center gap-10 border-b border-slate-200 pb-3">
       <div className="flex items-center gap-4">
         <img src="./favicon.svg" alt="" className="size-14 shrink-0" />
         <div className="leading-tight">
           <div className="text-3xl font-extrabold tracking-tight">
-            CBMDF <span className="text-red-400">· SEAQT</span>
+            CBMDF <span className="text-cbm-700">· SEAQT</span>
           </div>
-          <div className="text-base font-semibold tracking-[0.2em] text-slate-400 uppercase">Briefing Operacional</div>
+          <div className="text-base font-semibold tracking-[0.2em] text-slate-500 uppercase">Briefing Operacional</div>
         </div>
       </div>
 
-      <div className="h-12 w-px bg-white/10" />
+      <div className="h-12 w-px bg-slate-300" />
 
       <div className="leading-tight">
-        <div className="text-base font-semibold tracking-wider text-slate-400 uppercase">Serviço de</div>
+        <div className="text-base font-semibold tracking-wider text-slate-500 uppercase">Serviço de</div>
         <div className="text-3xl font-bold">{formatarData(data)}</div>
       </div>
 
@@ -125,15 +125,15 @@ function Progresso({ feitas, total }: { feitas: number; total: number }) {
   return (
     <div className="w-[15rem]">
       <div className="flex items-baseline justify-between">
-        <span className="text-base font-semibold tracking-wider text-slate-400 uppercase">Checklist</span>
+        <span className="text-base font-semibold tracking-wider text-slate-500 uppercase">Checklist</span>
         <span className="text-2xl font-extrabold tabular-nums">
           {feitas}
-          <span className="text-slate-500">/{total}</span>
+          <span className="text-slate-400">/{total}</span>
         </span>
       </div>
-      <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-white/10">
+      <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-slate-200">
         <div
-          className={`h-full rounded-full transition-[width] duration-700 ${feitas === total ? 'bg-emerald-400' : 'bg-sky-400'}`}
+          className={`h-full rounded-full transition-[width] duration-700 ${feitas === total ? 'bg-emerald-500' : 'bg-marinho-600'}`}
           style={{ width: `${(feitas / total) * 100}%` }}
         />
       </div>
@@ -145,12 +145,12 @@ function AoVivo({ conectado }: { conectado: boolean }) {
   return (
     <div
       className={`flex items-center gap-2.5 rounded-full px-4 py-2 text-lg font-semibold ring-1 ${
-        conectado ? 'bg-emerald-500/10 text-emerald-300 ring-emerald-400/30' : 'bg-amber-400/10 text-amber-300 ring-amber-400/30'
+        conectado ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/30' : 'bg-amber-50 text-amber-700 ring-amber-500/40'
       }`}
     >
       <span className="relative flex size-3">
-        {conectado && <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400 opacity-75" />}
-        <span className={`relative size-3 rounded-full ${conectado ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+        {conectado && <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />}
+        <span className={`relative size-3 rounded-full ${conectado ? 'bg-emerald-500' : 'bg-amber-500'}`} />
       </span>
       {conectado ? 'Ao vivo' : 'Reconectando…'}
     </div>
@@ -166,7 +166,7 @@ function Relogio() {
   return (
     <div className="text-right">
       <div className="text-5xl leading-none font-extrabold tabular-nums">{HORA.format(agora)}</div>
-      <div className="mt-1 text-base text-slate-400 first-letter:uppercase">{DATA_EXTENSO.format(agora)}</div>
+      <div className="mt-1 text-base text-slate-500 first-letter:uppercase">{DATA_EXTENSO.format(agora)}</div>
     </div>
   )
 }

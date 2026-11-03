@@ -29,15 +29,15 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
           {visiveis.map((viatura) => {
             const nomes = condutores(viatura)
             return (
-              <li key={viatura.id} className="rounded-xl bg-white/5 px-3 py-2">
+              <li key={viatura.id} className="rounded-xl bg-slate-50 px-3 py-2">
                 <div className="flex items-center gap-3">
                   <span className="text-3xl leading-none font-black tracking-tight whitespace-nowrap">{viatura.prefixo}</span>
-                  <span className="min-w-0 flex-1 truncate text-base text-slate-400">{viatura.descricao}</span>
-                  <span className="shrink-0 rounded-md bg-sky-400/15 px-2 py-0.5 text-sm font-bold tracking-wider text-sky-300 ring-1 ring-sky-400/30">
+                  <span className="min-w-0 flex-1 truncate text-base text-slate-500">{viatura.descricao}</span>
+                  <span className="shrink-0 rounded-md bg-marinho-50 px-2 py-0.5 text-sm font-bold tracking-wider text-marinho-700 ring-1 ring-marinho-700/20">
                     {viatura.base}
                   </span>
                 </div>
-                <div className={`mt-1 truncate text-2xl leading-tight ${nomes.length > 0 ? 'font-semibold' : 'text-slate-500'}`}>
+                <div className={`mt-1 truncate text-2xl leading-tight ${nomes.length > 0 ? 'font-semibold' : 'text-slate-400'}`}>
                   {nomes.length > 0 ? LISTA.format(nomes) : 'Sem condutor'}
                 </div>
               </li>
@@ -47,9 +47,9 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
       )}
       <Mais restantes={restantes} />
       {indisponiveis.length > 0 && (
-        <p className="mt-auto shrink-0 truncate pt-2 text-lg text-slate-400">
+        <p className="mt-auto shrink-0 truncate pt-2 text-lg text-slate-500">
           Indisponíveis:{' '}
-          <span className="font-semibold text-slate-300">{indisponiveis.map((viatura) => viatura.prefixo).join(', ')}</span>
+          <span className="font-semibold text-slate-700">{indisponiveis.map((viatura) => viatura.prefixo).join(', ')}</span>
         </p>
       )}
     </Quadro>
