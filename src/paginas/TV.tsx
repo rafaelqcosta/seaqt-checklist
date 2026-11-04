@@ -95,7 +95,7 @@ function Cabecalho({ data, conectado, progressoChecklist }: CabecalhoProps) {
   return (
     <header className="flex shrink-0 items-center gap-10 border-b border-slate-200 pb-3">
       <div className="flex items-center gap-4">
-        <img src="./favicon.svg" alt="" className="size-14 shrink-0" />
+        <img src="./brasao.svg" alt="" className="size-16 shrink-0" />
         <div className="leading-tight">
           <div className="text-3xl font-extrabold tracking-tight">
             CBMDF <span className="text-cbm-700">· SEAQT</span>

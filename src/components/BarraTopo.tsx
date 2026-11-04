@@ -13,7 +13,7 @@ const LINKS: { rota: Rota; href: string; rotulo: string; Icone: typeof Tv }[] = 
 export function Marca({ subtitulo = 'Checklist Operacional' }: { subtitulo?: string }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5">
-      <img src="./favicon.svg" alt="" className="size-9 shrink-0" />
+      <img src="./brasao.svg" alt="" className="size-10 shrink-0" />
       <div className="min-w-0 leading-tight">
         <div className="text-sm font-extrabold tracking-tight text-marinho-700">
           CBMDF <span className="text-cbm-700">· SEAQT</span>
