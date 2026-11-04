@@ -23,7 +23,7 @@ export function Login() {
       <form onSubmit={entrar} className="cartao w-full max-w-sm p-6">
         <Marca subtitulo="Briefing · Grupamento de Mergulho" />
         <h1 className="mt-6 text-xl font-bold text-slate-900">Entrar</h1>
-        <p className="mt-1 text-sm text-slate-500">Use o mesmo login do BUCOMAT.</p>
+        <p className="mt-1 text-sm text-slate-500">Use seu e-mail e senha.</p>
 
         <label className="mt-5 block">
           <span className="rotulo">E-mail</span>
