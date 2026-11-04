@@ -55,6 +55,8 @@ export interface MilitarBrado {
   nomeGuerra: string
   turno: string | null
   aviso: string | null
+  /** Foto do BRADO (data URL); só é gravada para quem ainda não tem foto no SEAQT. */
+  foto?: string | null
 }
 
 export interface ItemChecklist {

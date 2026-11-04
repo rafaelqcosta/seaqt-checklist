@@ -120,10 +120,43 @@ export async function registrarEscalaBrado(
     await supabase.rpc('seaqt_registrar_escala_brado', {
       p_data: data,
       p_cod_lotacao: codLotacao,
-      p_militares: militares,
+      // a foto não vai para a função do banco: é copiada à parte (copiarFotosBrado)
+      p_militares: militares.map(({ foto: _foto, ...militar }) => militar),
       p_lido_em: lidoEm,
     }),
   )
+}
+
+const somenteDigitos = (texto: string) => texto.replace(/\D/g, '')
+
+/**
+ * Grava a foto vinda do BRADO para os militares (achados pela matrícula) que ainda não têm foto.
+ * Foto já cadastrada nunca é trocada. Devolve quantas fotos foram copiadas.
+ */
+export async function copiarFotosBrado(militares: MilitarBrado[]): Promise<number> {
+  const fotoPorMatricula = new Map(
+    militares.flatMap((militar) => (militar.foto && somenteDigitos(militar.matricula) ? [[somenteDigitos(militar.matricula), militar.foto]] : [])),
+  )
+  if (fotoPorMatricula.size === 0) return 0
+
+  const semFoto = verificar(
+    await supabase.from('seaqt_militares').select('id, matricula').is('foto_path', null),
+  ) as Pick<Militar, 'id' | 'matricula'>[]
+  let copiadas = 0
+  for (const militar of semFoto) {
+    const foto = fotoPorMatricula.get(somenteDigitos(militar.matricula ?? ''))
+    if (!foto) continue
+    const caminho = `fotos/${crypto.randomUUID()}.jpg`
+    const imagem = await redimensionarImagem(await (await fetch(foto)).blob())
+    verificar(await supabase.storage.from(BUCKET).upload(caminho, imagem, { contentType: 'image/jpeg' }))
+    // is(foto_path, null): se alguém cadastrou uma foto nesse meio-tempo, ela fica
+    const atualizados = verificar(
+      await supabase.from('seaqt_militares').update({ foto_path: caminho }).eq('id', militar.id).is('foto_path', null).select('id'),
+    )
+    if (!atualizados?.length) await supabase.storage.from(BUCKET).remove([caminho])
+    else copiadas++
+  }
+  return copiadas
 }
 
 export async function criarOrdem(data: string, campos: NovaOrdem, pdf?: File | null): Promise<void> {

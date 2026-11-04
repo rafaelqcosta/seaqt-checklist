@@ -59,7 +59,7 @@ export async function abrirArquivo(caminho: string): Promise<void> {
 }
 
 /** Reduz a foto para no máximo `lado` px (JPEG) antes do upload. */
-export async function redimensionarImagem(arquivo: File, lado = 480): Promise<Blob> {
+export async function redimensionarImagem(arquivo: Blob, lado = 480): Promise<Blob> {
   const imagem = await createImageBitmap(arquivo)
   const escala = Math.min(1, lado / Math.max(imagem.width, imagem.height))
   const canvas = document.createElement('canvas')

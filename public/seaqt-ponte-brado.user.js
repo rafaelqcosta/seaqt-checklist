@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SEAQT · Ponte BRADO
 // @namespace    https://rafaelqcosta.github.io/seaqt-checklist/
-// @version      0.1.0
+// @version      0.2.0
 // @description  Lê a escala do dia no BRADO (só leitura) e entrega ao SEAQT aberto no mesmo navegador.
 // @match        https://brado.cbm.df.gov.br/*
 // @match        https://rafaelqcosta.github.io/seaqt-checklist/*
@@ -18,8 +18,9 @@
 /*
  * Como funciona
  * - Na aba do BRADO: lê a escala do dia de serviço (ao abrir e a cada 15 min, ou quando o SEAQT pede)
- *   usando o login que o usuário já fez. Usa SÓ a consulta fnBradoListaEscalaServico; nunca chama
- *   as funções de escrita do BRADO ("Cadastra..."). Nenhuma senha, cookie ou token é lido ou guardado.
+ *   usando o login que o usuário já fez. Usa SÓ a consulta fnBradoListaEscalaServico e a foto do
+ *   militar (/oauth/avatar, a mesma que o BRADO mostra); nunca chama as funções de escrita do BRADO
+ *   ("Cadastra..."). Nenhuma senha, cookie ou token é lido ou guardado.
  * - Na aba do SEAQT: entrega a escala lida ao SEAQT, que grava com o login do próprio usuário.
  * - As duas abas conversam pelo armazenamento do próprio Tampermonkey, neste navegador.
  */
@@ -71,11 +72,31 @@
     // na tela de login não há sessão para ler
     if (location.pathname.includes('/auth/')) return
 
-    const CONSULTA = `query MilitaresEscalas($pCodLotacao: Int, $pDatReferencia: Date) {
+    const consulta = (comCodPessoa) => `query MilitaresEscalas($pCodLotacao: Int, $pDatReferencia: Date) {
       fnBradoListaEscalaServico(pCodLotacao: $pCodLotacao, pDatReferencia: $pDatReferencia) {
-        nodes { vlrIdentificacaoUnica sglPostoGraduacao nomGuerraServidor nomTurno flgServico jsonPresenca }
+        nodes { vlrIdentificacaoUnica sglPostoGraduacao nomGuerraServidor nomTurno flgServico jsonPresenca${comCodPessoa ? ' codPessoaServidor' : ''} }
       }
     }`
+    // se o BRADO não aceitar codPessoaServidor nessa consulta, a escala segue sem fotos
+    let aceitaCodPessoa = true
+
+    // fotos já baixadas nesta aba (codPessoa -> data URL ou null): cada uma é pedida uma vez só
+    const fotos = new Map()
+    async function lerFoto(codPessoa) {
+      if (codPessoa == null) return null
+      if (!fotos.has(codPessoa)) {
+        let foto = null
+        try {
+          const resposta = await fetch(`/api-nexus/oauth/avatar/${codPessoa}`, { credentials: 'include' })
+          const base64 = resposta.ok ? (await resposta.json())?.base64 : null
+          if (typeof base64 === 'string' && base64) foto = base64.startsWith('data:') ? base64 : `data:image/jpeg;base64,${base64}`
+        } catch {
+          // sem foto não impede a escala
+        }
+        fotos.set(codPessoa, foto)
+      }
+      return fotos.get(codPessoa)
+    }
 
     function faltaLancada(no) {
       return (no.jsonPresenca ?? []).some((p) => p.cod_motivo_falta != null || p.flg_presenca === false)
@@ -89,7 +110,7 @@
         body: JSON.stringify({
           operationName: 'MilitaresEscalas',
           variables: { pCodLotacao: codLotacao, pDatReferencia: data.replaceAll('-', '/') },
-          query: CONSULTA,
+          query: consulta(aceitaCodPessoa),
         }),
       })
       if (resposta.status === 401 || resposta.status === 403) {
@@ -97,17 +118,27 @@
       }
       if (!resposta.ok) throw new Error(`O BRADO respondeu com erro ${resposta.status}.`)
       const json = await resposta.json()
-      if (json.errors?.length) throw new Error(`BRADO: ${json.errors[0].message}`)
+      if (json.errors?.length) {
+        if (aceitaCodPessoa && json.errors.some((e) => String(e.message).includes('codPessoaServidor'))) {
+          aceitaCodPessoa = false
+          return lerLotacao(data, codLotacao)
+        }
+        throw new Error(`BRADO: ${json.errors[0].message}`)
+      }
       // flgServico = false: saiu da escala (postergação, dispensa...). Só vai quem está de serviço.
-      return (json.data?.fnBradoListaEscalaServico?.nodes ?? [])
-        .filter((no) => no.flgServico)
-        .map((no) => ({
+      const nos = (json.data?.fnBradoListaEscalaServico?.nodes ?? []).filter((no) => no.flgServico)
+      const militares = []
+      for (const no of nos) {
+        militares.push({
           matricula: String(no.vlrIdentificacaoUnica ?? ''),
           posto: no.sglPostoGraduacao ?? '',
           nomeGuerra: no.nomGuerraServidor ?? '',
           turno: no.nomTurno ?? null,
           aviso: faltaLancada(no) ? 'Falta lançada no BRADO' : null,
-        }))
+          foto: await lerFoto(no.codPessoaServidor),
+        })
+      }
+      return militares
     }
 
     let lendo = false
@@ -152,6 +183,7 @@
     const enviar = (mensagem) => window.postMessage({ origem: 'seaqt-ponte', ...mensagem }, location.origin)
     const bradoAberto = () => Date.now() - GM_getValue(CHAVES.bradoVivo, 0) < BRADO_VIVO_MS
     const enviarEstado = () => enviar({ tipo: 'estado', bradoAberto: bradoAberto() })
+    // a foto vai junto; o SEAQT só a grava para quem ainda não tem foto
     const enviarEscala = (escala) => escala && enviar({ tipo: 'escala', ...escala })
 
     let espera = null

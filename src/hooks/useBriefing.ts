@@ -150,6 +150,18 @@ export function useBriefing(dataServico: string) {
     [executar, recarregar],
   )
 
+  /** Copia as fotos lidas do BRADO para quem ainda não tem foto (falha aqui não atrapalha a escala). */
+  const copiarFotosBrado = useCallback(
+    async (militares: MilitarBrado[]) => {
+      try {
+        if ((await dados.copiarFotosBrado(militares)) > 0) recarregar()
+      } catch (e) {
+        console.error('Falha ao copiar fotos do BRADO', e)
+      }
+    },
+    [recarregar],
+  )
+
   const adicionarNaEquipe = useCallback(
     (militarIds: string[]) =>
       executar(() => dados.adicionarNaEquipe(dataServico, militarIds), {
@@ -290,6 +302,7 @@ export function useBriefing(dataServico: string) {
     adicionarNaEquipe,
     removerDaEquipe,
     registrarEscalaBrado,
+    copiarFotosBrado,
     criarOrdem,
     excluirOrdem,
     salvarMilitar,

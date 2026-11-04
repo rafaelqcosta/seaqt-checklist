@@ -8,7 +8,7 @@ import type { DadosDia } from '../../lib/tipos'
 
 /** Situação da leitura do BRADO no dia e botão para pedir nova leitura à ponte. */
 export function BarraBrado({ briefing, dia }: { briefing: Briefing; dia: DadosDia }) {
-  const ponte = usePonteBrado(briefing.registrarEscalaBrado, dia.data)
+  const ponte = usePonteBrado(briefing.registrarEscalaBrado, briefing.copiarFotosBrado, dia.data)
 
   const lidoEm = dia.escalaBrado.reduce<string | null>((maisRecente, e) => (!maisRecente || e.lido_em > maisRecente ? e.lido_em : maisRecente), null)
   const porLotacao = Object.entries(LOTACOES_BRADO)

@@ -49,7 +49,11 @@ function marcarGravada(id: string) {
   }
 }
 
-export function usePonteBrado(registrar: Briefing['registrarEscalaBrado'], dataServico: string) {
+export function usePonteBrado(
+  registrar: Briefing['registrarEscalaBrado'],
+  copiarFotos: Briefing['copiarFotosBrado'],
+  dataServico: string,
+) {
   const [instalada, setInstalada] = useState(false)
   const [bradoAberto, setBradoAberto] = useState(false)
   const [sincronizando, setSincronizando] = useState(false)
@@ -73,6 +77,7 @@ export function usePonteBrado(registrar: Briefing['registrarEscalaBrado'], dataS
           for (const lotacao of msg.lotacoes) {
             if (!(await registrar(msg.data, lotacao.codLotacao, lotacao.militares, msg.lidoEm))) return
           }
+          await copiarFotos(msg.lotacoes.flatMap((lotacao) => lotacao.militares))
           marcarGravada(msg.id)
         }
         setSincronizando(false)
@@ -82,7 +87,7 @@ export function usePonteBrado(registrar: Briefing['registrarEscalaBrado'], dataS
     window.addEventListener('message', aoReceber)
     window.postMessage({ origem: 'seaqt-app', tipo: 'ola' }, window.location.origin)
     return () => window.removeEventListener('message', aoReceber)
-  }, [registrar])
+  }, [registrar, copiarFotos])
 
   const sincronizar = useCallback(() => {
     setSincronizando(true)
