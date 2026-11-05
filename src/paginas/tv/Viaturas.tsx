@@ -1,26 +1,25 @@
 import { Ship } from 'lucide-react'
+import { Avatar } from '../../components/Avatar'
+import { useUrlsAssinadas } from '../../lib/arquivos'
 import { emServico, valorIds } from '../../lib/checklist'
 import { CHAVES } from '../../lib/constantes'
 import { nomeMilitar } from '../../lib/militares'
-import type { Cadastros, DadosDia, Viatura } from '../../lib/tipos'
+import type { Cadastros, DadosDia, Militar, Viatura } from '../../lib/tipos'
 import { limitar, Mais, Quadro, Vazio } from './Quadro'
 
 const MAXIMO_VIATURAS = 5
-// Intl.ListFormat não existe no navegador da TV (Chrome 63): 'A, B e C' montado à mão
-function juntarNomes(nomes: string[]): string {
-  return nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}` : nomes.join('')
-}
 
 export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastros }) {
   const militarPorId = new Map(cadastros.militares.map((militar) => [militar.id, militar]))
   const deServico = cadastros.viaturas.filter((viatura) => emServico(dia, viatura))
   const { visiveis, restantes } = limitar(deServico, MAXIMO_VIATURAS)
 
-  const condutores = (viatura: Viatura) =>
+  const condutores = (viatura: Viatura): Militar[] =>
     valorIds(dia, CHAVES.viatura(viatura.id)).flatMap((id) => {
       const militar = militarPorId.get(id)
-      return militar?.ativo ? [nomeMilitar(militar)] : []
+      return militar?.ativo ? [militar] : []
     })
+  const urls = useUrlsAssinadas(deServico.flatMap((viatura) => condutores(viatura).map((militar) => militar.foto_path)))
 
   return (
     <Quadro titulo="Viaturas" Icone={Ship}>
@@ -29,7 +28,7 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
       ) : (
         <ul className="flex flex-col gap-2">
           {visiveis.map((viatura) => {
-            const nomes = condutores(viatura)
+            const militares = condutores(viatura)
             return (
               <li key={viatura.id} className="rounded-xl bg-slate-50 px-3 py-2">
                 <div className="flex items-center gap-3">
@@ -39,9 +38,22 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
                     {viatura.base}
                   </span>
                 </div>
-                <div className={`mt-1 truncate text-2xl leading-tight ${nomes.length > 0 ? 'font-semibold' : 'text-slate-400'}`}>
-                  {nomes.length > 0 ? juntarNomes(nomes) : 'Sem condutor'}
-                </div>
+                {militares.length > 0 ? (
+                  <ul className="mt-1.5 flex flex-col gap-1.5">
+                    {militares.map((militar) => (
+                      <li key={militar.id} className="flex items-center gap-2.5">
+                        <Avatar
+                          militar={militar}
+                          url={militar.foto_path ? urls[militar.foto_path] : undefined}
+                          className="size-9 rounded-full text-sm"
+                        />
+                        <span className="min-w-0 flex-1 truncate text-2xl leading-tight font-semibold">{nomeMilitar(militar)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="mt-1 text-2xl leading-tight text-slate-400">Sem condutor</div>
+                )}
               </li>
             )
           })}
