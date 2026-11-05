@@ -17,14 +17,20 @@
           erros.push((e.message || 'erro ao carregar ' + (e.target && e.target.src)) + (e.filename ? ' @ ' + e.filename + ':' + e.lineno : ''));
         }, true);
         window.addEventListener('unhandledrejection', function (e) { erros.push('promise: ' + (e.reason && e.reason.message || e.reason)); });
-        setTimeout(function () {
+        // Confere a cada 3 s: o app montou e depois sumiu (ex.: erro após o login), ou nunca montou em 10 s.
+        var inicio = Date.now();
+        var montou = false;
+        var verificador = setInterval(function () {
           var raiz = document.getElementById('root');
-          if (!raiz || raiz.children.length) return;
+          if (!raiz) return;
+          if (raiz.children.length) { montou = true; return; }
+          if (!montou && Date.now() - inicio < 10000) return;
+          clearInterval(verificador);
           var caixa = document.createElement('pre');
           caixa.style.cssText = 'white-space:pre-wrap;font:16px monospace;padding:24px;color:#000;background:#fff';
           caixa.textContent = 'O SEAQT não abriu neste navegador.\n\n' + navigator.userAgent + '\n\n' + (erros.join('\n') || 'nenhum erro registrado');
           document.body.appendChild(caixa);
-        }, 10000);
+        }, 3000);
       })();
     </script>
   </head>
