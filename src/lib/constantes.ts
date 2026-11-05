@@ -39,4 +39,6 @@ export const CHAVES = {
   incendioObs: 'incendio.obs',
   guarnicao: (funcaoId: string) => `guarnicao:${funcaoId}`,
   viatura: (viaturaId: string) => `viatura:${viaturaId}`,
+  /** true = viatura em serviço no dia (só vale para viatura ativa no cadastro). */
+  viaturaServico: (viaturaId: string) => `viatura_servico:${viaturaId}`,
 } as const

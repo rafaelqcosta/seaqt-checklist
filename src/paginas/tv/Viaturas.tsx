@@ -1,5 +1,5 @@
 import { Ship } from 'lucide-react'
-import { valorIds } from '../../lib/checklist'
+import { emServico, valorIds } from '../../lib/checklist'
 import { CHAVES } from '../../lib/constantes'
 import { nomeMilitar } from '../../lib/militares'
 import type { Cadastros, DadosDia, Viatura } from '../../lib/tipos'
@@ -13,9 +13,8 @@ function juntarNomes(nomes: string[]): string {
 
 export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastros }) {
   const militarPorId = new Map(cadastros.militares.map((militar) => [militar.id, militar]))
-  const disponiveis = cadastros.viaturas.filter((viatura) => viatura.ativa)
-  const indisponiveis = cadastros.viaturas.filter((viatura) => !viatura.ativa)
-  const { visiveis, restantes } = limitar(disponiveis, MAXIMO_VIATURAS)
+  const deServico = cadastros.viaturas.filter((viatura) => emServico(dia, viatura))
+  const { visiveis, restantes } = limitar(deServico, MAXIMO_VIATURAS)
 
   const condutores = (viatura: Viatura) =>
     valorIds(dia, CHAVES.viatura(viatura.id)).flatMap((id) => {
@@ -25,8 +24,8 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
 
   return (
     <Quadro titulo="Viaturas" Icone={Ship}>
-      {disponiveis.length === 0 ? (
-        <Vazio>Nenhuma viatura disponível</Vazio>
+      {deServico.length === 0 ? (
+        <Vazio>Nenhuma viatura em serviço</Vazio>
       ) : (
         <ul className="flex flex-col gap-2">
           {visiveis.map((viatura) => {
@@ -49,12 +48,6 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
         </ul>
       )}
       <Mais restantes={restantes} />
-      {indisponiveis.length > 0 && (
-        <p className="mt-auto shrink-0 truncate pt-2 text-lg text-slate-500">
-          Indisponíveis:{' '}
-          <span className="font-semibold text-slate-700">{indisponiveis.map((viatura) => viatura.prefixo).join(', ')}</span>
-        </p>
-      )}
     </Quadro>
   )
 }

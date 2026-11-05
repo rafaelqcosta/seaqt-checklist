@@ -1,5 +1,5 @@
 import { CHAVES, SISTEMAS_CBMDF } from './constantes'
-import type { Cadastros, Condicao, DadosDia, Funcao, Militar, StatusCondicao } from './tipos'
+import type { Cadastros, Condicao, DadosDia, Funcao, Militar, StatusCondicao, Viatura } from './tipos'
 
 /** true / false / null (não respondido). */
 export function valorBool(dia: DadosDia, chave: string): boolean | null {
@@ -16,6 +16,11 @@ export function valorTexto(dia: DadosDia, chave: string): string {
 export function valorIds(dia: DadosDia, chave: string): string[] {
   const valor = dia.checklist[chave]?.valor
   return Array.isArray(valor) ? valor.filter((id): id is string => typeof id === 'string') : []
+}
+
+/** Ativa = pronta para emprego (cadastro). Em serviço = escalada no dia; viatura inativa nunca está em serviço. */
+export function emServico(dia: DadosDia, viatura: Viatura): boolean {
+  return viatura.ativa && valorBool(dia, CHAVES.viaturaServico(viatura.id)) === true
 }
 
 /**

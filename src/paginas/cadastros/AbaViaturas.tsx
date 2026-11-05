@@ -25,13 +25,13 @@ interface Props {
 
 export function AbaViaturas({ viaturas, salvar, excluir }: Props) {
   const [editando, setEditando] = useState<Viatura | 'nova' | null>(null)
-  const disponiveis = viaturas.filter((v) => v.ativa).length
+  const ativas = viaturas.filter((v) => v.ativa).length
 
   return (
     <>
       <CabecalhoAba
         titulo="Viaturas"
-        resumo={`${contar(viaturas.length, 'viatura', 'viaturas')} · ${contar(disponiveis, 'disponível', 'disponíveis')}`}
+        resumo={`${contar(viaturas.length, 'viatura', 'viaturas')} · ${contar(ativas, 'ativa', 'ativas')}`}
         rotuloNovo="Nova viatura"
         onNovo={() => setEditando('nova')}
       />
@@ -55,7 +55,7 @@ export function AbaViaturas({ viaturas, salvar, excluir }: Props) {
                   Base {viatura.base} · ordem {viatura.ordem}
                 </span>
               </span>
-              <Selo positivo={viatura.ativa}>{viatura.ativa ? 'Disponível' : 'Indisponível'}</Selo>
+              <Selo positivo={viatura.ativa}>{viatura.ativa ? 'Ativa' : 'Inativa'}</Selo>
             </ItemCadastro>
           ))}
         </ListaCadastro>
@@ -190,8 +190,8 @@ function FormViatura({
         </fieldset>
 
         <LinhaInterruptor
-          rotulo="Disponível"
-          descricao="Indisponível não recebe condutores e aparece à parte na TV."
+          rotulo="Ativa"
+          descricao="Pronta para ser empregada. Inativa não pode entrar em serviço no dia."
           ligado={ativa}
           onChange={setAtiva}
         />
