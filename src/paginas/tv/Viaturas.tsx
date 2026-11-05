@@ -6,7 +6,10 @@ import type { Cadastros, DadosDia, Viatura } from '../../lib/tipos'
 import { limitar, Mais, Quadro, Vazio } from './Quadro'
 
 const MAXIMO_VIATURAS = 5
-const LISTA = new Intl.ListFormat('pt-BR', { type: 'conjunction' })
+// Intl.ListFormat não existe no navegador da TV (Chrome 63): 'A, B e C' montado à mão
+function juntarNomes(nomes: string[]): string {
+  return nomes.length > 1 ? `${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}` : nomes.join('')
+}
 
 export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastros }) {
   const militarPorId = new Map(cadastros.militares.map((militar) => [militar.id, militar]))
@@ -38,7 +41,7 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
                   </span>
                 </div>
                 <div className={`mt-1 truncate text-2xl leading-tight ${nomes.length > 0 ? 'font-semibold' : 'text-slate-400'}`}>
-                  {nomes.length > 0 ? LISTA.format(nomes) : 'Sem condutor'}
+                  {nomes.length > 0 ? juntarNomes(nomes) : 'Sem condutor'}
                 </div>
               </li>
             )

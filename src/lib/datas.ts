@@ -7,13 +7,15 @@ const partesBrasilia = new Intl.DateTimeFormat('en-CA', {
   day: '2-digit',
   hour: '2-digit',
   hourCycle: 'h23',
+  hour12: false, // Chrome 63 (TV) ignora hourCycle
 })
 
 /** Dia de serviço em curso (YYYY-MM-DD). Vira às HORA_TROCA_SERVICO de Brasília. */
 export function diaServicoAtual(agora = new Date()): string {
   const partes = Object.fromEntries(partesBrasilia.formatToParts(agora).map((p) => [p.type, p.value]))
   const hoje = `${partes.year}-${partes.month}-${partes.day}`
-  return Number(partes.hour) < HORA_TROCA_SERVICO ? somarDias(hoje, -1) : hoje
+  // % 24: Chrome antigo escreve meia-noite como '24'
+  return Number(partes.hour) % 24 < HORA_TROCA_SERVICO ? somarDias(hoje, -1) : hoje
 }
 
 export function somarDias(dataIso: string, dias: number): string {
