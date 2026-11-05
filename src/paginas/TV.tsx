@@ -10,6 +10,7 @@ import type { Cadastros, DadosDia } from '../lib/tipos'
 import { Checklist } from './tv/Checklist'
 import { Guarnicoes } from './tv/Guarnicoes'
 import { Meteorologia } from './tv/Meteorologia'
+import { PrevisaoHoras } from './tv/PrevisaoHoras'
 import { Ordens } from './tv/Ordens'
 import { Pessoal } from './tv/Pessoal'
 import { Viaturas } from './tv/Viaturas'
@@ -79,6 +80,7 @@ function Conteudo({ cadastros, dia, resumo, tempo }: ConteudoProps) {
       </div>
       <div className="flex min-h-0 flex-col gap-4">
         <Meteorologia meteo={tempo.meteo} erro={tempo.erro} />
+        {tempo.meteo && tempo.meteo.proximasHoras.length > 0 && <PrevisaoHoras horas={tempo.meteo.proximasHoras} />}
         <Checklist dia={dia} resumo={resumo} />
       </div>
     </div>

@@ -17,7 +17,22 @@ export interface Meteo {
   minima: number | null
   /** Horário da medição (ISO local de Brasília, sem fuso). */
   medidoEm: string
+  /** Previsão hora a hora a partir da hora atual. */
+  proximasHoras: PrevisaoHora[]
 }
+
+export interface PrevisaoHora {
+  /** ISO local de Brasília, hora cheia ('2026-10-28T13:00'). */
+  hora: string
+  temperatura: number
+  /** Probabilidade de chuva (%). */
+  chuva: number | null
+  codigo: number
+  ehDia: boolean
+}
+
+/** Quantas horas a previsão hora a hora cobre. */
+const HORAS_PREVISAO = 12
 
 /** Severidade para a operação na água. */
 export type Severidade = 'normal' | 'atencao' | 'perigo'
@@ -28,7 +43,7 @@ export async function buscarMeteo(): Promise<Meteo> {
     longitude: String(LOCAL_METEO.longitude),
     current:
       'temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,is_day',
-    hourly: 'precipitation_probability',
+    hourly: 'precipitation_probability,temperature_2m,weather_code,is_day',
     daily: 'temperature_2m_max,temperature_2m_min',
     timezone: FUSO,
     forecast_days: '2',
@@ -60,6 +75,16 @@ export async function buscarMeteo(): Promise<Meteo> {
     maxima: json.daily?.temperature_2m_max?.[0] ?? null,
     minima: json.daily?.temperature_2m_min?.[0] ?? null,
     medidoEm: atual.time,
+    proximasHoras:
+      inicio === -1
+        ? []
+        : horas.slice(inicio, inicio + HORAS_PREVISAO).map((hora, indice) => ({
+            hora,
+            temperatura: json.hourly.temperature_2m[inicio + indice],
+            chuva: probabilidades[inicio + indice] ?? null,
+            codigo: json.hourly.weather_code[inicio + indice],
+            ehDia: json.hourly.is_day[inicio + indice] === 1,
+          })),
   }
 }
 
