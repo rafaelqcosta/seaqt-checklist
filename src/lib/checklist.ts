@@ -32,6 +32,8 @@ export function equipeDoDia(dia: DadosDia, cadastros: Cadastros) {
       militar,
       condicao: condicaoPorMilitar.get(militar.id) ?? condicaoNaoInformada(dia.data, militar.id),
       brado: bradoPorMilitar.get(militar.id),
+      // no BRADO, escala com turno de 12h (08h–20h ou 20h–08h) = Gratificação de Serviço Voluntário
+      gsv: Boolean(bradoPorMilitar.get(militar.id)?.turno),
     }))
 }
 

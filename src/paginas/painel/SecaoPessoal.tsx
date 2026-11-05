@@ -48,7 +48,7 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
         </Vazio>
       ) : (
         <ul className="divide-y divide-slate-100">
-          {equipe.map(({ militar, condicao, brado }) => (
+          {equipe.map(({ militar, condicao, brado, gsv }) => (
             <li key={militar.id} className="py-3 first:pt-0 last:pb-0">
               <div className="flex items-center gap-3">
                 <Avatar
@@ -57,7 +57,12 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
                   className="size-12 rounded-full text-base"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold text-slate-900">{nomeMilitar(militar)}</p>
+                  <p className="flex items-center gap-2 font-bold text-slate-900">
+                    <span className="truncate">{nomeMilitar(militar)}</span>
+                    {gsv && (
+                      <span className="shrink-0 rounded bg-orange-500 px-1.5 py-0.5 text-xs leading-none font-extrabold text-white">GSV</span>
+                    )}
+                  </p>
                   {brado && (
                     <p className="truncate text-xs text-slate-500">
                       BRADO · {LOTACOES_BRADO[brado.cod_lotacao] ?? brado.cod_lotacao}

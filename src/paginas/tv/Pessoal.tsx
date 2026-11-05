@@ -29,11 +29,12 @@ export function Pessoal({ equipe }: { equipe: Integrante[] }) {
   const compacto = equipe.length > CARTOES_POR_LINHA
   const colunas = Math.ceil((visiveis.length + (restantes > 0 ? 1 : 0)) / 2)
 
-  const cartoes = visiveis.map(({ militar, condicao }) => (
+  const cartoes = visiveis.map(({ militar, condicao, gsv }) => (
     <Cartao
       key={militar.id}
       militar={militar}
       status={condicao.status}
+      gsv={gsv}
       url={militar.foto_path ? urls[militar.foto_path] : undefined}
       compacto={compacto}
     />
@@ -84,11 +85,12 @@ function Contador({ quantidade, rotulo, cor }: { quantidade: number; rotulo: str
 interface CartaoProps {
   militar: Militar
   status: StatusCondicao | null
+  gsv: boolean
   url?: string
   compacto: boolean
 }
 
-function Cartao({ militar, status, url, compacto }: CartaoProps) {
+function Cartao({ militar, status, gsv, url, compacto }: CartaoProps) {
   const estilo = ESTILO[status ?? 'aguardando']
   const rotulo = status ? ROTULO_STATUS[status] : 'Aguardando'
   const esmaecido = status === 'ausente' ? 'opacity-50 grayscale' : ''
@@ -98,7 +100,10 @@ function Cartao({ militar, status, url, compacto }: CartaoProps) {
       <article className={`flex min-w-0 items-center gap-3 overflow-hidden rounded-2xl border bg-white p-2 ${estilo.borda} ${esmaecido}`}>
         <Avatar militar={militar} url={url} className="size-20 rounded-xl text-3xl" />
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="truncate text-base font-semibold text-slate-500">{militar.posto_graduacao}</div>
+          <div className="flex items-center gap-2 text-base font-semibold text-slate-500">
+            <span className="truncate">{militar.posto_graduacao}</span>
+            {gsv && <TagGsv className="text-sm" />}
+          </div>
           <div className="truncate text-xl font-extrabold">{militar.nome_guerra}</div>
           <div className={`mt-1 inline-block max-w-full truncate rounded-md px-2 py-0.5 text-sm font-extrabold tracking-wide uppercase ${estilo.faixa}`}>
             {rotulo}
@@ -114,13 +119,24 @@ function Cartao({ militar, status, url, compacto }: CartaoProps) {
     >
       <Avatar militar={militar} url={url} className="aspect-square w-full text-6xl" />
       <div className="px-3 py-2 leading-tight">
-        <div className="truncate text-lg font-semibold text-slate-500">{militar.posto_graduacao}</div>
+        <div className="flex items-center gap-2 text-lg font-semibold text-slate-500">
+          <span className="truncate">{militar.posto_graduacao}</span>
+          {gsv && <TagGsv className="text-base" />}
+        </div>
         <div className="truncate text-2xl font-extrabold">{militar.nome_guerra}</div>
       </div>
       <div className={`mt-auto py-1.5 text-center text-xl font-extrabold tracking-wide whitespace-nowrap uppercase ${estilo.faixa}`}>
         {rotulo}
       </div>
     </article>
+  )
+}
+
+function TagGsv({ className }: { className: string }) {
+  return (
+    <span className={`shrink-0 rounded-md bg-orange-500 px-2 py-0.5 leading-tight font-extrabold tracking-wide text-white ${className}`}>
+      GSV
+    </span>
   )
 }
 
