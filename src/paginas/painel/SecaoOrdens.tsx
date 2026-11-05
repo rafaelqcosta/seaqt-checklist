@@ -1,4 +1,4 @@
-import { FileText, LoaderCircle, MapPin, Paperclip, Plus, Trash2 } from 'lucide-react'
+import { FileText, LoaderCircle, MapPin, MapPinned, Paperclip, Plus, Trash2 } from 'lucide-react'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Modal } from '../../components/Modal'
 import type { Briefing } from '../../hooks/useBriefing'
@@ -14,6 +14,11 @@ function problemaNoPdf(arquivo: File): string | null {
   if (arquivo.type !== 'application/pdf' && !/\.pdf$/i.test(arquivo.name)) return 'Escolha um arquivo PDF.'
   if (arquivo.size > LIMITE_PDF_MB * 1024 * 1024) return `O PDF deve ter no máximo ${LIMITE_PDF_MB} MB.`
   return null
+}
+
+/** Aceita só http(s): o link vira um <a href> (banco também barra o resto). */
+function linkValido(texto: string): boolean {
+  return /^https?:\/\/\S+$/i.test(texto)
 }
 
 export function SecaoOrdens({ briefing, dia }: PropsSecao) {
@@ -60,6 +65,18 @@ export function SecaoOrdens({ briefing, dia }: PropsSecao) {
                   PDF
                 </button>
               )}
+              {ordem.link_mapa && (
+                <a
+                  href={ordem.link_mapa}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Abrir localização no mapa"
+                  aria-label={`Localização da OM ${ordem.titulo}`}
+                  className="botao-secundario w-11 shrink-0 px-0"
+                >
+                  <MapPinned className="size-5" />
+                </a>
+              )}
               <button
                 type="button"
                 onClick={() => excluir(ordem)}
@@ -88,6 +105,7 @@ function NovaOrdem({ criarOrdem, onFechar }: { criarOrdem: Briefing['criarOrdem'
   const [titulo, setTitulo] = useState('')
   const [horario, setHorario] = useState('')
   const [local, setLocal] = useState('')
+  const [linkMapa, setLinkMapa] = useState('')
   const [pdf, setPdf] = useState<File | null>(null)
   const [erroPdf, setErroPdf] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -100,11 +118,16 @@ function NovaOrdem({ criarOrdem, onFechar }: { criarOrdem: Briefing['criarOrdem'
     if (problema) evento.target.value = ''
   }
 
+  const linkInvalido = linkMapa.trim() !== '' && !linkValido(linkMapa.trim())
+
   const salvar = async (evento: FormEvent) => {
     evento.preventDefault()
-    if (!titulo.trim() || enviando) return
+    if (!titulo.trim() || enviando || linkInvalido) return
     setEnviando(true)
-    const ok = await criarOrdem({ titulo: titulo.trim(), horario: horario || null, local: local.trim() || null }, pdf)
+    const ok = await criarOrdem(
+      { titulo: titulo.trim(), horario: horario || null, local: local.trim() || null, link_mapa: linkMapa.trim() || null },
+      pdf,
+    )
     setEnviando(false)
     if (ok) {
       avisar('OM adicionada')
@@ -118,7 +141,7 @@ function NovaOrdem({ criarOrdem, onFechar }: { criarOrdem: Briefing['criarOrdem'
       onFechar={() => !enviando && onFechar()}
       titulo="Nova ordem de missão"
       rodape={
-        <button type="submit" form="nova-om" disabled={enviando || !titulo.trim()} className="botao-primario w-full">
+        <button type="submit" form="nova-om" disabled={enviando || !titulo.trim() || linkInvalido} className="botao-primario w-full">
           {enviando && <LoaderCircle className="size-4 animate-spin" />}
           {enviando ? 'Enviando…' : 'Adicionar OM'}
         </button>
@@ -157,6 +180,21 @@ function NovaOrdem({ criarOrdem, onFechar }: { criarOrdem: Briefing['criarOrdem'
               className="campo"
             />
           </div>
+        </div>
+        <div>
+          <label htmlFor="om-link-mapa" className="rotulo">
+            Link da localização
+          </label>
+          <input
+            id="om-link-mapa"
+            type="url"
+            inputMode="url"
+            value={linkMapa}
+            onChange={(e) => setLinkMapa(e.target.value)}
+            placeholder="Opcional · cole o link do Google Maps"
+            className="campo"
+          />
+          {linkInvalido && <p className="mt-1 text-sm font-medium text-cbm-700">Cole um link que comece com https://</p>}
         </div>
         <div>
           <span className="rotulo">PDF da OM</span>

@@ -74,6 +74,8 @@ export interface OrdemMissao {
   /** 'HH:MM:SS' */
   horario: string | null
   local: string | null
+  /** Link de localização (Google Maps), só http(s). */
+  link_mapa: string | null
   arquivo_path: string | null
   arquivo_nome: string | null
   atualizado_em: string
@@ -104,4 +106,5 @@ export interface NovaOrdem {
   titulo: string
   horario: string | null
   local: string | null
+  link_mapa: string | null
 }
