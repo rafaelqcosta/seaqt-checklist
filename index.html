@@ -12,6 +12,16 @@
     <!-- Diagnóstico permanente para navegadores sem console (TV, celulares antigos): se o app não montar
          ou sumir depois, mostra navegador e erros na tela para o usuário mandar print. ES5 de propósito. -->
     <script>
+      // Sem `gap` em flex (Chrome < 84, ex.: TV): liga o espaçamento por margem gerado no vite.config.ts.
+      (function () {
+        var teste = document.createElement('div');
+        teste.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute';
+        teste.appendChild(document.createElement('div'));
+        teste.appendChild(document.createElement('div'));
+        document.documentElement.appendChild(teste);
+        if (teste.scrollHeight !== 1) document.documentElement.className += ' sem-flex-gap';
+        document.documentElement.removeChild(teste);
+      })();
       (function () {
         var erros = [];
         window.addEventListener('error', function (e) {
