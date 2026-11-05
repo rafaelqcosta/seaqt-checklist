@@ -32,7 +32,7 @@ export function TV() {
   const resumo = cadastrosAtivos && dia ? resumoBriefing(dia, cadastrosAtivos) : null
 
   return (
-    <main className="flex h-screen w-screen flex-col gap-4 overflow-hidden p-4">
+    <main className="flex h-screen w-screen flex-col gap-3 overflow-hidden px-4 pt-2.5 pb-4">
       <Cabecalho data={data} conectado={conectado} progressoChecklist={resumo && progresso(resumo)} />
 
       {cadastrosAtivos && dia && resumo ? (
@@ -93,22 +93,22 @@ interface CabecalhoProps {
 
 function Cabecalho({ data, conectado, progressoChecklist }: CabecalhoProps) {
   return (
-    <header className="flex shrink-0 items-center gap-10 border-b border-slate-200 pb-3">
-      <div className="flex items-center gap-4">
-        <img src="./brasao.svg" alt="" className="size-16 shrink-0" />
+    <header className="flex shrink-0 items-center gap-8 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-3">
+        <img src="./brasao.svg" alt="" className="size-11 shrink-0" />
         <div className="leading-tight">
-          <div className="text-3xl font-extrabold tracking-tight">
+          <div className="text-2xl font-extrabold tracking-tight">
             CBMDF <span className="text-cbm-700">· SEAQT</span>
           </div>
-          <div className="text-base font-semibold tracking-[0.2em] text-slate-500 uppercase">Briefing Operacional</div>
+          <div className="text-xs font-semibold tracking-[0.2em] text-slate-500 uppercase">Briefing Operacional</div>
         </div>
       </div>
 
-      <div className="h-12 w-px bg-slate-300" />
+      <div className="h-9 w-px bg-slate-300" />
 
       <div className="leading-tight">
-        <div className="text-base font-semibold tracking-wider text-slate-500 uppercase">Serviço de</div>
-        <div className="text-3xl font-bold">{formatarData(data)}</div>
+        <div className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Serviço de</div>
+        <div className="text-2xl font-bold">{formatarData(data)}</div>
       </div>
 
       {progressoChecklist && <Progresso {...progressoChecklist} />}
@@ -125,13 +125,13 @@ function Progresso({ feitas, total }: { feitas: number; total: number }) {
   return (
     <div className="w-[15rem]">
       <div className="flex items-baseline justify-between">
-        <span className="text-base font-semibold tracking-wider text-slate-500 uppercase">Checklist</span>
-        <span className="text-2xl font-extrabold tabular-nums">
+        <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Checklist</span>
+        <span className="text-xl font-extrabold tabular-nums">
           {feitas}
           <span className="text-slate-400">/{total}</span>
         </span>
       </div>
-      <div className="mt-1.5 h-2.5 overflow-hidden rounded-full bg-slate-200">
+      <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
         <div
           className={`h-full rounded-full transition-[width] duration-700 ${feitas === total ? 'bg-emerald-500' : 'bg-marinho-600'}`}
           style={{ width: `${(feitas / total) * 100}%` }}
@@ -144,7 +144,7 @@ function Progresso({ feitas, total }: { feitas: number; total: number }) {
 function AoVivo({ conectado }: { conectado: boolean }) {
   return (
     <div
-      className={`flex items-center gap-2.5 rounded-full px-4 py-2 text-lg font-semibold ring-1 ${
+      className={`flex items-center gap-2.5 rounded-full px-3.5 py-1 text-base font-semibold ring-1 ${
         conectado ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/30' : 'bg-amber-50 text-amber-700 ring-amber-500/40'
       }`}
     >
@@ -165,8 +165,8 @@ function Relogio() {
   const agora = useAgora(1000)
   return (
     <div className="text-right">
-      <div className="text-5xl leading-none font-extrabold tabular-nums">{HORA.format(agora)}</div>
-      <div className="mt-1 text-base text-slate-500 first-letter:uppercase">{DATA_EXTENSO.format(agora)}</div>
+      <div className="text-4xl leading-none font-extrabold tabular-nums">{HORA.format(agora)}</div>
+      <div className="mt-0.5 text-sm text-slate-500 first-letter:uppercase">{DATA_EXTENSO.format(agora)}</div>
     </div>
   )
 }
