@@ -5,7 +5,7 @@ import { Quadro, Vazio } from './Quadro'
 
 export function Ordens({ ordens }: { ordens: OrdemMissao[] }) {
   return (
-    <Quadro titulo="Ordens de missão" Icone={ClipboardList}>
+    <Quadro titulo="Ordens de missão" Icone={ClipboardList} className="flex-1">
       {ordens.length === 0 ? (
         <Vazio>Nenhuma OM para hoje</Vazio>
       ) : (

@@ -75,13 +75,13 @@ function Conteudo({ cadastros, dia, resumo, tempo }: ConteudoProps) {
         <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-1 gap-4">
           <Guarnicoes dia={dia} guarnicao={guarnicao} />
           <Viaturas dia={dia} cadastros={cadastros} />
-          <Ordens ordens={dia.ordens} />
+          <Checklist dia={dia} resumo={resumo} />
         </div>
       </div>
       <div className="flex min-h-0 flex-col gap-4">
         <Meteorologia meteo={tempo.meteo} erro={tempo.erro} />
         {tempo.meteo && tempo.meteo.proximasHoras.length > 0 && <PrevisaoHoras horas={tempo.meteo.proximasHoras} />}
-        <Checklist dia={dia} resumo={resumo} />
+        <Ordens ordens={dia.ordens} />
       </div>
     </div>
   )
