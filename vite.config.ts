@@ -17,7 +17,7 @@ const fallbackPropertySempre = {
   },
 }
 
-const navegadoresAntigos = ['chrome >= 63', 'safari >= 12', 'firefox >= 68']
+const navegadoresAntigos = ['chrome >= 47', 'safari >= 10', 'firefox >= 60']
 
 // base relativa: funciona no GitHub Pages (/seaqt-checklist/) e em qualquer outro host estático
 export default defineConfig({
@@ -25,5 +25,5 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), legacy({ targets: navegadoresAntigos })],
   // @layer (Tailwind v4) só existe no Chrome 99+; antes disso o navegador descarta todo o CSS
   css: { postcss: { plugins: [fallbackPropertySempre, cascadeLayers()] } },
-  build: { cssTarget: ['chrome63', 'safari12', 'firefox68'] },
+  build: { cssTarget: ['chrome47', 'safari10', 'firefox60'] },
 })

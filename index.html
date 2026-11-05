@@ -9,6 +9,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>SEAQT · Briefing Operacional</title>
+    <!-- Diagnóstico para navegadores sem console (TV): se o app não montar, mostra o erro na tela. ES5 de propósito. -->
+    <script>
+      (function () {
+        var erros = [];
+        window.addEventListener('error', function (e) {
+          erros.push((e.message || 'erro ao carregar ' + (e.target && e.target.src)) + (e.filename ? ' @ ' + e.filename + ':' + e.lineno : ''));
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) { erros.push('promise: ' + (e.reason && e.reason.message || e.reason)); });
+        setTimeout(function () {
+          var raiz = document.getElementById('root');
+          if (!raiz || raiz.children.length) return;
+          var caixa = document.createElement('pre');
+          caixa.style.cssText = 'white-space:pre-wrap;font:16px monospace;padding:24px;color:#000;background:#fff';
+          caixa.textContent = 'O SEAQT não abriu neste navegador.\n\n' + navigator.userAgent + '\n\n' + (erros.join('\n') || 'nenhum erro registrado');
+          document.body.appendChild(caixa);
+        }, 10000);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
