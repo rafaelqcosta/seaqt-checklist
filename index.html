@@ -9,7 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <title>SEAQT · Briefing Operacional</title>
-    <!-- Diagnóstico para navegadores sem console (TV): se o app não montar, mostra o erro na tela. ES5 de propósito. -->
+    <!-- Diagnóstico permanente para navegadores sem console (TV, celulares antigos): se o app não montar
+         ou sumir depois, mostra navegador e erros na tela para o usuário mandar print. ES5 de propósito. -->
     <script>
       (function () {
         var erros = [];
@@ -28,7 +29,7 @@
           clearInterval(verificador);
           var caixa = document.createElement('pre');
           caixa.style.cssText = 'white-space:pre-wrap;font:16px monospace;padding:24px;color:#000;background:#fff';
-          caixa.textContent = 'O SEAQT não abriu neste navegador.\n\n' + navigator.userAgent + '\n\n' + (erros.join('\n') || 'nenhum erro registrado');
+          caixa.textContent = 'O SEAQT não abriu neste navegador.\n\n' + navigator.userAgent + '\n' + location.href + '\n' + new Date().toString() + '\n\n' + (erros.join('\n') || 'nenhum erro registrado') + '\n\nTire print desta tela e mande para o desenvolvedor.';
           document.body.appendChild(caixa);
         }, 3000);
       })();
