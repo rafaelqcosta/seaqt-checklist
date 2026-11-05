@@ -89,16 +89,22 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
                     role="radio"
                     aria-checked={condicao.status === status}
                     onClick={() =>
-                      condicao.status !== status &&
-                      // ao voltar a apto, o motivo (pode ser dado de saúde) deixa de ser guardado
-                      briefing.definirCondicao(militar.id, status === 'apto' ? { status, observacao: null } : { status })
+                      // tocar de novo no marcado volta a "aguardando"; ao voltar a apto ou aguardando,
+                      // o motivo (pode ser dado de saúde) deixa de ser guardado
+                      condicao.status === status
+                        ? briefing.definirCondicao(militar.id, { status: null, observacao: null })
+                        : briefing.definirCondicao(militar.id, status === 'apto' ? { status, observacao: null } : { status })
                     }
+                    title={condicao.status === status ? 'Toque de novo para voltar a aguardando' : undefined}
                     className={`botao border px-2 ${condicao.status === status ? ativo : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}
                   >
                     {ROTULO_STATUS[status]}
                   </button>
                 ))}
               </div>
+              {condicao.status !== null && (
+                <p className="mt-1 text-center text-xs text-slate-400">Toque de novo no marcado para voltar a aguardando</p>
+              )}
 
               {(condicao.status === 'inapto' || condicao.status === 'ausente') && (
                 <div className="mt-2">
