@@ -1,6 +1,7 @@
 import { Pencil, Play, Plus, Square } from 'lucide-react'
 import { useState } from 'react'
 import { Interruptor } from '../../components/Controles'
+import { IconeViatura } from '../../components/IconeViatura'
 import { SeletorMilitares } from '../../components/Modal'
 import { emServico, equipeDoDia, valorIds } from '../../lib/checklist'
 import { BASES, CHAVES } from '../../lib/constantes'
@@ -40,7 +41,10 @@ export function SecaoViaturas({ briefing, dia, cadastros }: PropsSecao) {
               <li key={viatura.id} className="py-3 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-3">
                   <div className={`min-w-0 flex-1 ${viatura.ativa ? '' : 'opacity-50'}`}>
-                    <p className="text-lg leading-tight font-extrabold text-slate-900">{viatura.prefixo}</p>
+                    <p className="flex items-center gap-2 text-lg leading-tight font-extrabold text-slate-900">
+                      {viatura.prefixo}
+                      <IconeViatura icone={viatura.icone} className="h-6 max-w-16" />
+                    </p>
                     <p className="truncate text-sm text-slate-500">{viatura.ativa ? viatura.descricao : 'Inativa'}</p>
                   </div>
                   <label className="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-semibold text-slate-600">

@@ -1,6 +1,7 @@
-import type { BASES } from './constantes'
+import type { BASES, ICONES_VIATURA } from './constantes'
 
 export type Base = (typeof BASES)[number]
+export type IconeViatura = (typeof ICONES_VIATURA)[number]['id']
 export type StatusCondicao = 'apto' | 'inapto' | 'ausente'
 
 export interface Militar {
@@ -19,6 +20,7 @@ export interface Viatura {
   base: Base
   ativa: boolean
   ordem: number
+  icone: IconeViatura | null
 }
 
 export interface Funcao {

@@ -1,5 +1,6 @@
 import { Ship } from 'lucide-react'
 import { Avatar } from '../../components/Avatar'
+import { IconeViatura } from '../../components/IconeViatura'
 import { useUrlsAssinadas } from '../../lib/arquivos'
 import { emServico, valorIds } from '../../lib/checklist'
 import { CHAVES } from '../../lib/constantes'
@@ -30,6 +31,7 @@ export function Viaturas({ dia, cadastros }: { dia: DadosDia; cadastros: Cadastr
               <li key={viatura.id} className="rounded-xl bg-slate-50 px-3 py-2">
                 <div className="flex items-center gap-3">
                   <span className="text-[1.625rem] leading-none font-black tracking-tight whitespace-nowrap">{viatura.prefixo}</span>
+                  <IconeViatura icone={viatura.icone} className="h-8 max-w-24" />
                   <span className="min-w-0 flex-1 truncate text-base text-slate-500">{viatura.descricao}</span>
                   <span className="shrink-0 rounded-md bg-marinho-50 px-2 py-0.5 text-sm font-bold tracking-wider text-marinho-700 ring-1 ring-marinho-700/20">
                     {viatura.base}

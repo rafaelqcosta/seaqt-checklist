@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
+import { IconeViatura } from '../../components/IconeViatura'
 import { Modal } from '../../components/Modal'
 import type { Briefing } from '../../hooks/useBriefing'
-import { BASES } from '../../lib/constantes'
-import type { Base, Viatura } from '../../lib/tipos'
+import { BASES, ICONES_VIATURA } from '../../lib/constantes'
+import type { Base, IconeViatura as Icone, Viatura } from '../../lib/tipos'
 import {
   CabecalhoAba,
   Campo,
@@ -47,6 +48,7 @@ export function AbaViaturas({ viaturas, salvar, excluir }: Props) {
               >
                 {viatura.prefixo}
               </span>
+              <IconeViatura icone={viatura.icone} className={`h-9 max-w-20 ${viatura.ativa ? '' : 'opacity-50 grayscale'}`} />
               <span className="min-w-0 flex-1">
                 <span className={`block truncate font-semibold ${viatura.ativa ? 'text-slate-900' : 'text-slate-500'}`}>
                   {viatura.descricao || 'Sem descrição'}
@@ -91,6 +93,7 @@ function FormViatura({
   const [base, setBase] = useState<Base>(viatura?.base ?? 'BUC')
   const [ordem, setOrdem] = useState(String(viatura?.ordem ?? proximaOrdem(viaturas)))
   const [ativa, setAtiva] = useState(viatura?.ativa ?? true)
+  const [icone, setIcone] = useState<Icone | null>(viatura?.icone ?? null)
   const [erro, setErro] = useState<string | null>(null)
   const { salvando, enviar } = useEnvio(onFechar)
 
@@ -110,6 +113,7 @@ function FormViatura({
         base,
         ordem: Math.round(Number(ordem)) || 0,
         ativa,
+        icone,
       }),
     )
   }
@@ -184,6 +188,24 @@ function FormViatura({
                 className={`botao border ${base === opcao ? 'border-marinho-700 bg-marinho-700 text-white' : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50'}`}
               >
                 {opcao}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="rotulo">Ícone (opcional)</legend>
+          <div className="grid grid-cols-5 gap-2">
+            {[null, ...ICONES_VIATURA.map((opcao) => opcao.id)].map((opcao) => (
+              <button
+                key={opcao ?? 'nenhum'}
+                type="button"
+                aria-pressed={icone === opcao}
+                aria-label={opcao ? undefined : 'Sem ícone'}
+                onClick={() => setIcone(opcao)}
+                className={`flex h-14 items-center justify-center rounded-lg border p-1.5 ${icone === opcao ? 'border-marinho-700 bg-marinho-50 ring-2 ring-marinho-700' : 'border-slate-300 bg-white hover:bg-slate-50'}`}
+              >
+                {opcao ? <IconeViatura icone={opcao} className="max-h-full max-w-full" /> : <span className="text-xs font-semibold text-slate-500">Nenhum</span>}
               </button>
             ))}
           </div>

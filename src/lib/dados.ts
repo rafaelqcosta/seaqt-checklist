@@ -37,7 +37,7 @@ function verificar<T>(resposta: { data: T; error: unknown }): T {
 export async function buscarCadastros(): Promise<Cadastros> {
   const [militares, viaturas, funcoes] = await Promise.all([
     supabase.from('seaqt_militares').select('id, posto_graduacao, nome_guerra, matricula, foto_path, ativo'),
-    supabase.from('seaqt_viaturas').select('id, prefixo, descricao, base, ativa, ordem').order('ordem').order('prefixo'),
+    supabase.from('seaqt_viaturas').select('id, prefixo, descricao, base, ativa, ordem, icone').order('ordem').order('prefixo'),
     supabase.from('seaqt_funcoes').select('id, nome, ordem, ativa').order('ordem').order('nome'),
   ])
   return {
