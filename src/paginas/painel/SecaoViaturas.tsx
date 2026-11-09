@@ -25,7 +25,7 @@ export function SecaoViaturas({ briefing, dia, cadastros }: PropsSecao) {
 
   return (
     <Secao
-      numero={6}
+      numero={5}
       titulo="Viaturas"
       detalhe={viaturas.length === 0 ? 'Nenhuma viatura cadastrada' : `${deServico} em serviço · ${ativas}/${viaturas.length} ativas`}
     >

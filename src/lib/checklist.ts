@@ -38,8 +38,17 @@ export function equipeDoDia(dia: DadosDia, cadastros: Cadastros) {
       condicao: condicaoPorMilitar.get(militar.id) ?? condicaoNaoInformada(dia.data, militar.id),
       brado: bradoPorMilitar.get(militar.id),
       // no BRADO, escala com turno de 12h (08h–20h ou 20h–08h) = Gratificação de Serviço Voluntário
-      gsv: Boolean(bradoPorMilitar.get(militar.id)?.turno),
+      gsv: turnoGsv(bradoPorMilitar.get(militar.id)?.turno),
     }))
+}
+
+export type TurnoGsv = 'diurno' | 'noturno'
+
+/** '08h00 às 20h00' → diurno · '20h00 às 08h00' → noturno · sem turno → null (não é GSV). */
+function turnoGsv(turno: string | null | undefined): TurnoGsv | null {
+  if (!turno) return null
+  const horaInicio = Number(turno.slice(0, 2))
+  return horaInicio >= 18 || horaInicio < 6 ? 'noturno' : 'diurno'
 }
 
 function condicaoNaoInformada(data: string, militarId: string): Condicao {

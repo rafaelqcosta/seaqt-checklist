@@ -1,16 +1,17 @@
-import { LoaderCircle, TriangleAlert } from 'lucide-react'
+import { LoaderCircle, Maximize, Minimize, TriangleAlert } from 'lucide-react'
 import { useEffect } from 'react'
 import { useAgora, useDiaServicoAtual, useMeteo } from '../hooks/useApp'
 import { useBriefing } from '../hooks/useBriefing'
-import { equipeDoDia, guarnicaoDoDia, progresso, resumoBriefing, type ResumoSecao } from '../lib/checklist'
+import { useTelaCheia } from '../hooks/useTelaCheia'
+import { equipeDoDia, guarnicaoDoDia, resumoBriefing, type ResumoSecao } from '../lib/checklist'
 import { FUSO } from '../lib/constantes'
 import { formatarData, formatarHora } from '../lib/datas'
 import type { Meteo } from '../lib/meteo'
 import type { Cadastros, DadosDia } from '../lib/tipos'
+import { BuscaAndamento } from './tv/BuscaAndamento'
 import { Checklist } from './tv/Checklist'
 import { Guarnicoes } from './tv/Guarnicoes'
-import { Meteorologia } from './tv/Meteorologia'
-import { PrevisaoHoras } from './tv/PrevisaoHoras'
+import { MeteoCabecalho } from './tv/MeteoCabecalho'
 import { Ordens } from './tv/Ordens'
 import { Pessoal } from './tv/Pessoal'
 import { Viaturas } from './tv/Viaturas'
@@ -18,7 +19,7 @@ import { Viaturas } from './tv/Viaturas'
 /** Painel-resumo para a TV da sala de operações (só leitura, sem rolagem). */
 export function TV() {
   const data = useDiaServicoAtual()
-  const { cadastros, dia, conectado, erro, sincronizadoEm } = useBriefing(data)
+  const { cadastros, dia, erro, sincronizadoEm } = useBriefing(data)
   // fora do Conteudo para não buscar de novo quando o dia de serviço vira e os dados recarregam
   const tempo = useMeteo()
 
@@ -34,10 +35,10 @@ export function TV() {
 
   return (
     <main className="flex h-screen w-screen flex-col gap-3 overflow-hidden px-4 pt-2.5 pb-4">
-      <Cabecalho data={data} conectado={conectado} progressoChecklist={resumo && progresso(resumo)} />
+      <Cabecalho data={data} tempo={tempo} />
 
       {cadastrosAtivos && dia && resumo ? (
-        <Conteudo cadastros={cadastrosAtivos} dia={dia} resumo={resumo} tempo={tempo} />
+        <Conteudo cadastros={cadastrosAtivos} dia={dia} resumo={resumo} />
       ) : (
         <div className="flex flex-1 items-center justify-center">
           <LoaderCircle className="size-16 animate-spin text-marinho-600" />
@@ -61,39 +62,36 @@ interface ConteudoProps {
   cadastros: Cadastros
   dia: DadosDia
   resumo: ResumoSecao[]
-  tempo: { meteo: Meteo | null; erro: boolean }
 }
 
-function Conteudo({ cadastros, dia, resumo, tempo }: ConteudoProps) {
+/** Duas linhas: Pessoal | Ordens em cima, Guarnições/Viaturas/Checklist | Busca embaixo. */
+function Conteudo({ cadastros, dia, resumo }: ConteudoProps) {
   const equipe = equipeDoDia(dia, cadastros)
   const guarnicao = guarnicaoDoDia(dia, cadastros)
 
   return (
-    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_26rem] grid-rows-1 gap-4">
-      <div className="flex min-h-0 min-w-0 flex-col gap-4">
-        <Pessoal equipe={equipe} />
-        <div className="grid min-h-0 flex-1 grid-cols-3 grid-rows-1 gap-4">
-          <Guarnicoes dia={dia} guarnicao={guarnicao} />
-          <Viaturas dia={dia} cadastros={cadastros} />
-          <Checklist dia={dia} resumo={resumo} />
-        </div>
+    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_26rem] grid-rows-[auto_minmax(0,1fr)] gap-4">
+      <Pessoal equipe={equipe} />
+      {/* a altura da linha vem do Pessoal; muitas OMs rolam em vez de esticar a linha */}
+      <div className="relative min-h-0">
+        <Ordens ordens={dia.ordens} className="absolute inset-0" />
       </div>
-      <div className="flex min-h-0 flex-col gap-4">
-        <Meteorologia meteo={tempo.meteo} erro={tempo.erro} />
-        {tempo.meteo && tempo.meteo.proximasHoras.length > 0 && <PrevisaoHoras horas={tempo.meteo.proximasHoras} />}
-        <Ordens ordens={dia.ordens} />
+      <div className="grid min-h-0 grid-cols-3 grid-rows-1 gap-4">
+        <Guarnicoes dia={dia} guarnicao={guarnicao} />
+        <Viaturas dia={dia} cadastros={cadastros} />
+        <Checklist dia={dia} resumo={resumo} />
       </div>
+      <BuscaAndamento />
     </div>
   )
 }
 
 interface CabecalhoProps {
   data: string
-  conectado: boolean
-  progressoChecklist: { feitas: number; total: number } | null
+  tempo: { meteo: Meteo | null; erro: boolean }
 }
 
-function Cabecalho({ data, conectado, progressoChecklist }: CabecalhoProps) {
+function Cabecalho({ data, tempo }: CabecalhoProps) {
   return (
     <header className="flex shrink-0 items-center gap-8 border-b border-slate-200 pb-2">
       <div className="flex items-center gap-3">
@@ -113,49 +111,33 @@ function Cabecalho({ data, conectado, progressoChecklist }: CabecalhoProps) {
         <div className="text-2xl font-bold">{formatarData(data)}</div>
       </div>
 
-      {progressoChecklist && <Progresso {...progressoChecklist} />}
+      <div className="h-9 w-px bg-slate-300" />
 
-      <div className="ml-auto flex items-center gap-8">
-        <AoVivo conectado={conectado} />
+      <MeteoCabecalho meteo={tempo.meteo} erro={tempo.erro} />
+
+      <div className="ml-auto flex items-center gap-6">
+        <BotaoTelaCheia />
         <Relogio />
       </div>
     </header>
   )
 }
 
-function Progresso({ feitas, total }: { feitas: number; total: number }) {
+/** Na TV, a tela cheia esconde abas e barra de endereço do navegador. */
+function BotaoTelaCheia() {
+  const { ativa, suportada, alternar } = useTelaCheia()
+  if (!suportada) return null
+  const Icone = ativa ? Minimize : Maximize
   return (
-    <div className="w-[15rem]">
-      <div className="flex items-baseline justify-between">
-        <span className="text-xs font-semibold tracking-wider text-slate-500 uppercase">Checklist</span>
-        <span className="text-xl font-extrabold tabular-nums">
-          {feitas}
-          <span className="text-slate-400">/{total}</span>
-        </span>
-      </div>
-      <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
-        <div
-          className={`h-full rounded-full transition-[width] duration-700 ${feitas === total ? 'bg-emerald-500' : 'bg-marinho-600'}`}
-          style={{ width: `${(feitas / total) * 100}%` }}
-        />
-      </div>
-    </div>
-  )
-}
-
-function AoVivo({ conectado }: { conectado: boolean }) {
-  return (
-    <div
-      className={`flex items-center gap-2.5 rounded-full px-3.5 py-1 text-base font-semibold ring-1 ${
-        conectado ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/30' : 'bg-amber-50 text-amber-700 ring-amber-500/40'
-      }`}
+    <button
+      type="button"
+      onClick={alternar}
+      title={ativa ? 'Sair da tela cheia' : 'Tela cheia'}
+      aria-label={ativa ? 'Sair da tela cheia' : 'Tela cheia'}
+      className="flex size-11 items-center justify-center rounded-xl text-slate-500 ring-1 ring-slate-300 hover:bg-white hover:text-marinho-700"
     >
-      <span className="relative flex size-3">
-        {conectado && <span className="absolute inset-0 animate-ping rounded-full bg-emerald-500 opacity-75" />}
-        <span className={`relative size-3 rounded-full ${conectado ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-      </span>
-      {conectado ? 'Ao vivo' : 'Reconectando…'}
-    </div>
+      <Icone className="size-6" />
+    </button>
   )
 }
 

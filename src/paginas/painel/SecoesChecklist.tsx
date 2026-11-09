@@ -41,7 +41,7 @@ function Texto({ briefing, dia, chave, rotulo, placeholder, multilinha }: PropsC
 export function SecaoHiperbarica({ briefing, dia, resumo }: PropsSecao) {
   const campo = { briefing, dia }
   return (
-    <Secao numero={4} titulo="Contato com a hiperbárica" resumo={resumo}>
+    <Secao numero={3} titulo="Contato com a hiperbárica" resumo={resumo}>
       <PerguntaSimNao {...campo} chave={CHAVES.hiperbaricaContato} rotulo="Contato realizado?" />
       <Texto {...campo} chave={CHAVES.hiperbaricaHospital} rotulo="Hospital contatado" placeholder="Ex.: HFA" />
       <Texto {...campo} chave={CHAVES.hiperbaricaObs} rotulo="Observação" multilinha />
@@ -52,7 +52,7 @@ export function SecaoHiperbarica({ briefing, dia, resumo }: PropsSecao) {
 export function SecaoMaterial({ briefing, dia, resumo }: PropsSecao) {
   const campo = { briefing, dia }
   return (
-    <Secao numero={7} titulo="Material operacional" resumo={resumo}>
+    <Secao numero={6} titulo="Material operacional" resumo={resumo}>
       <PerguntaSimNao {...campo} chave={CHAVES.materialGrifo} rotulo="Conferido pelo GRIFO?" />
       <Texto {...campo} chave={CHAVES.materialObs} rotulo="Observações" multilinha />
     </Secao>
@@ -61,7 +61,7 @@ export function SecaoMaterial({ briefing, dia, resumo }: PropsSecao) {
 
 export function SecaoSistemas({ briefing, dia, resumo }: PropsSecao) {
   return (
-    <Secao numero={8} titulo="Sistemas CBMDF" resumo={resumo}>
+    <Secao numero={7} titulo="Sistemas CBMDF" resumo={resumo}>
       <ul className="flex flex-col gap-2">
         {SISTEMAS_CBMDF.map(({ chave, rotulo }) => {
           const feito = valorBool(dia, chave) === true
@@ -99,7 +99,7 @@ export function SecaoSistemas({ briefing, dia, resumo }: PropsSecao) {
 export function SecaoIncendio({ briefing, dia, resumo }: PropsSecao) {
   const campo = { briefing, dia }
   return (
-    <Secao numero={9} titulo="Combate a incêndio" resumo={resumo}>
+    <Secao numero={8} titulo="Combate a incêndio" resumo={resumo}>
       <PerguntaSimNao {...campo} chave={CHAVES.incendioOperacional} rotulo="Situação" rotuloSim="Operacional" rotuloNao="Inoperante" />
       <Texto {...campo} chave={CHAVES.incendioObs} rotulo="Observação" multilinha />
     </Secao>

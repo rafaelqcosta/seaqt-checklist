@@ -126,10 +126,3 @@ export function severidade(meteo: Meteo): Severidade {
   if ([65, 82].includes(meteo.codigo) || meteo.rajada >= 40) return 'atencao'
   return 'normal'
 }
-
-const PONTOS_CARDEAIS = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO']
-
-/** 225 -> 'SO' */
-export function direcaoCardinal(graus: number): string {
-  return PONTOS_CARDEAIS[Math.round((((graus % 360) + 360) % 360) / 45) % 8]
-}

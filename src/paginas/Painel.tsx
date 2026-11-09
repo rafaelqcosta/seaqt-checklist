@@ -1,12 +1,11 @@
 import { CloudOff, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { BarraTopo } from '../components/BarraTopo'
-import { useDiaServicoAtual, useMeteo } from '../hooks/useApp'
+import { useDiaServicoAtual } from '../hooks/useApp'
 import { useBriefing } from '../hooks/useBriefing'
 import { resumoBriefing, type SecaoId } from '../lib/checklist'
 import { BarraData } from './painel/BarraData'
 import { SecaoGuarnicoes } from './painel/SecaoGuarnicoes'
-import { SecaoMeteo } from './painel/SecaoMeteo'
 import { SecaoOrdens } from './painel/SecaoOrdens'
 import { SecaoPessoal } from './painel/SecaoPessoal'
 import { SecaoViaturas } from './painel/SecaoViaturas'
@@ -19,7 +18,6 @@ export function Painel() {
   const [escolhida, setEscolhida] = useState<string | null>(null)
   const data = escolhida ?? hoje
   const briefing = useBriefing(data)
-  const { meteo, erro: erroMeteo } = useMeteo()
   const { cadastros, dia, erro } = briefing
   const resumo = cadastros && dia ? resumoBriefing(dia, cadastros) : null
   const secao = (id: SecaoId) => resumo?.find((s) => s.id === id)
@@ -55,7 +53,6 @@ export function Painel() {
           <>
             <SecaoPessoal briefing={briefing} dia={dia} cadastros={cadastros} resumo={secao('pessoal')} />
             <SecaoGuarnicoes briefing={briefing} dia={dia} cadastros={cadastros} resumo={secao('guarnicao')} />
-            <SecaoMeteo meteo={meteo} erro={erroMeteo} />
             <SecaoHiperbarica briefing={briefing} dia={dia} cadastros={cadastros} resumo={secao('hiperbarica')} />
             <SecaoOrdens briefing={briefing} dia={dia} cadastros={cadastros} />
             <SecaoViaturas briefing={briefing} dia={dia} cadastros={cadastros} />

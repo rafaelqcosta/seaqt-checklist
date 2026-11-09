@@ -4,6 +4,7 @@ import { Avatar } from '../../components/Avatar'
 import { CampoTexto } from '../../components/Controles'
 import { ROTULO_STATUS } from '../../components/Estado'
 import { SeletorMilitares } from '../../components/Modal'
+import { TagGsv } from '../../components/TagGsv'
 import { useUrlsAssinadas } from '../../lib/arquivos'
 import { equipeDoDia } from '../../lib/checklist'
 import { LOTACOES_BRADO } from '../../lib/constantes'
@@ -59,9 +60,7 @@ export function SecaoPessoal({ briefing, dia, cadastros, resumo }: PropsSecao) {
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-2 font-bold text-slate-900">
                     <span className="truncate">{nomeMilitar(militar)}</span>
-                    {gsv && (
-                      <span className="shrink-0 rounded bg-orange-500 px-1.5 py-0.5 text-xs leading-none font-extrabold text-white">GSV</span>
-                    )}
+                    {gsv && <TagGsv turno={gsv} className="rounded px-1.5 py-0.5 text-xs" classeIcone="size-3" />}
                   </p>
                   {brado && (
                     <p className="truncate text-xs text-slate-500">

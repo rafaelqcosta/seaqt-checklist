@@ -1,8 +1,9 @@
 import { Users } from 'lucide-react'
 import { Avatar } from '../../components/Avatar'
 import { ROTULO_STATUS } from '../../components/Estado'
+import { TagGsv } from '../../components/TagGsv'
 import { useUrlsAssinadas } from '../../lib/arquivos'
-import type { equipeDoDia } from '../../lib/checklist'
+import type { equipeDoDia, TurnoGsv } from '../../lib/checklist'
 import type { Militar, StatusCondicao } from '../../lib/tipos'
 import { limitar, Quadro } from './Quadro'
 
@@ -85,7 +86,7 @@ function Contador({ quantidade, rotulo, cor }: { quantidade: number; rotulo: str
 interface CartaoProps {
   militar: Militar
   status: StatusCondicao | null
-  gsv: boolean
+  gsv: TurnoGsv | null
   url?: string
   compacto: boolean
 }
@@ -102,7 +103,7 @@ function Cartao({ militar, status, gsv, url, compacto }: CartaoProps) {
         <div className="min-w-0 flex-1 leading-tight">
           <div className="flex items-center gap-2 text-base font-semibold text-slate-500">
             <span className="truncate">{militar.posto_graduacao}</span>
-            {gsv && <TagGsv className="text-sm" />}
+            {gsv && <TagGsv turno={gsv} className="rounded-md px-1.5 py-0.5 text-sm" classeIcone="size-3.5" />}
           </div>
           <div className="truncate text-xl font-extrabold">{militar.nome_guerra}</div>
           <div className={`mt-1 inline-block max-w-full truncate rounded-md px-2 py-0.5 text-sm font-extrabold tracking-wide uppercase ${estilo.faixa}`}>
@@ -121,7 +122,7 @@ function Cartao({ militar, status, gsv, url, compacto }: CartaoProps) {
       <div className="px-3 py-2 leading-tight">
         <div className="flex items-center gap-2 text-lg font-semibold text-slate-500">
           <span className="truncate">{militar.posto_graduacao}</span>
-          {gsv && <TagGsv className="text-base" />}
+          {gsv && <TagGsv turno={gsv} className="rounded-md px-2 py-0.5 text-base" classeIcone="size-4" />}
         </div>
         <div className="truncate text-2xl font-extrabold">{militar.nome_guerra}</div>
       </div>
@@ -129,14 +130,6 @@ function Cartao({ militar, status, gsv, url, compacto }: CartaoProps) {
         {rotulo}
       </div>
     </article>
-  )
-}
-
-function TagGsv({ className }: { className: string }) {
-  return (
-    <span className={`shrink-0 rounded-md bg-orange-500 px-2 py-0.5 leading-tight font-extrabold tracking-wide text-white ${className}`}>
-      GSV
-    </span>
   )
 }
 

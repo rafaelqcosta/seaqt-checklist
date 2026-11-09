@@ -3,9 +3,9 @@ import { formatarHorario } from '../../lib/datas'
 import type { OrdemMissao } from '../../lib/tipos'
 import { Quadro, Vazio } from './Quadro'
 
-export function Ordens({ ordens }: { ordens: OrdemMissao[] }) {
+export function Ordens({ ordens, className }: { ordens: OrdemMissao[]; className?: string }) {
   return (
-    <Quadro titulo="Ordens de missão" Icone={ClipboardList} className="flex-1">
+    <Quadro titulo="Ordens de missão" Icone={ClipboardList} className={className}>
       {ordens.length === 0 ? (
         <Vazio>Nenhuma OM para hoje</Vazio>
       ) : (

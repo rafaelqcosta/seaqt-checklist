@@ -32,7 +32,7 @@ export function SecaoOrdens({ briefing, dia }: PropsSecao) {
 
   return (
     <Secao
-      numero={5}
+      numero={4}
       titulo="Ordens de missão"
       detalhe={ordens.length === 0 ? 'Nenhuma OM' : `${ordens.length} OM${ordens.length > 1 ? 's' : ''}`}
     >
