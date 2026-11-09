@@ -14,6 +14,7 @@ export const BASES = ['BUC', 'GBS'] as const
 /** Desenhos opcionais das viaturas (public/viaturas/<id>.webp). Mesma lista no check da tabela. */
 export const ICONES_VIATURA = [
   { id: 'lancha', rotulo: 'Lancha' },
+  { id: 'escaler', rotulo: 'Escaler' },
   { id: 'jet-ski', rotulo: 'Moto aquática' },
   { id: 'picape', rotulo: 'Picape' },
   { id: 'caminhao', rotulo: 'Caminhão' },

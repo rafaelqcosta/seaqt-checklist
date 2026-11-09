@@ -195,7 +195,7 @@ function FormViatura({
 
         <fieldset>
           <legend className="rotulo">Ícone (opcional)</legend>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 gap-2">
             {[null, ...ICONES_VIATURA.map((opcao) => opcao.id)].map((opcao) => (
               <button
                 key={opcao ?? 'nenhum'}
